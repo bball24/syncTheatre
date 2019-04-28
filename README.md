@@ -27,6 +27,8 @@ Make sure your MongoDB service is running
 Then start the API
 `npm start`
 
+**Note:** MongoDb Short Usage Guide [Here](https://github.com/bball24/syncTheatre/blob/master/src/api/notes/mongodb.md)
+
 
 ### Routes Information
 
