@@ -4,8 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var apiRouter = require('./routes/api.router');
 
 var app = express();
 
@@ -18,9 +17,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// Routers
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -36,6 +34,25 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+
+// MongoDB Connection
+let mongoUtil = require('./mongo.util');
+mongoUtil.connect((err, client) => {
+    if (err){
+        console.log(">[DB] :: Error Connecting to MongoDB Server. Quitting.")
+        console.error(err);
+        exit(-1)
+    }
+    else{
+        console.log(">[DB] :: Connection to MongoDB Server Successful")
+        console.log(">[DB] :: Creating Collection")
+        let db = mongoUtil.getConnection();
+        db.createCollection('rooms');
+        db.createCollection('users');
+        db.createCollection('videos');
+    }
 });
 
 module.exports = app;
