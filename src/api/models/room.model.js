@@ -2,24 +2,39 @@ var mongoUtil = require( '../mongo.util' );
 
 // room model code would go in here
 class Room {
-    constructor(founderID){
+    constructor(){
+        this.founderID = null;
         this.roomID = null;
         this.webSocket = null;
         this.users = [];
         this.videoQueue = [];
         this.currentVideo = null;
         this.roomStatus = null;
-        this.founderID = founderID;
-        this.partyLeaderID = founderID;
+        this.partyLeaderID = null;
         this.createdAt = null;
 
         this.db = mongoUtil.getConnection();
+        this.viewOptions = [
+            'roomID',
+            'founderID',
+            'webSocket',
+            'users',
+            'videoQueue',
+            'currentVideo',
+            'roomStatus',
+            'partyLeaderID',
+            'createdAt'
+        ];
+    }
+
+    generateRoomID(){
+        return mongoUtil.getNextID("roomID")
     }
 
     // ---- Utility Functions -----------
     toJson(){
         return {
-            roomId : this.roomID,
+            roomID : this.roomID,
             webSocket : this.webSocket,
             users : this.users,
             videoQueue : this.videoQueue,
@@ -34,20 +49,41 @@ class Room {
     // ----- Databasing Methods ---------
     save(){
         return new Promise((resolve, reject) => {
-            let room = this.toJson()
-            this.db.collection("rooms").insertOne(room, (err, result) => {
-                if(err){
-                    reject(err);
-                }
-                else{
-                    resolve(result);
-                }
-            });
+            this.generateRoomID().then((roomID) => {
+                this.roomID = roomID;
+                let room = this.toJson();
+                this.db.collection("rooms").insertOne(room, (err, result) => {
+                    if(err){
+                        reject(err);
+                    }
+                    else{
+                        resolve(result.ops.pop());
+                    }
+                });
+            })
+            .catch((err) => {
+                reject(err)
+            })
+
         })
     }
 
-    retrieve(roomID){
+    retrieve(id){
+        return new Promise((resolve, reject) => {
+            this.db.collection('rooms').findOne({roomID:Number(id)}, (err, doc) => {
+                if(err){
+                    reject(err);
+                }
 
+                if(doc){
+                    resolve(doc)
+                }
+                else{
+                    reject("Doc with id "+ id+ "was not found.");
+                }
+
+            })
+        });
     }
 
     // ---- Custom Room Functionality ---

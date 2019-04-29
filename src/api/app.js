@@ -49,9 +49,22 @@ mongoUtil.connect((err, client) => {
         console.log(">[DB] :: Connection to MongoDB Server Successful")
         console.log(">[DB] :: Creating Collection")
         let db = mongoUtil.getConnection();
+
+        //drop collections
+        db.collection('rooms').drop();
+        db.collection('users').drop();
+        db.collection('videos').drop();
+        db.collection('counters').drop();
+
+        //create collections
         db.createCollection('rooms');
         db.createCollection('users');
         db.createCollection('videos');
+        db.createCollection('counters');
+
+        //init tables
+        db.collection('counters').insertOne({_id:"roomID",sequence_value:0})
+
     }
 });
 

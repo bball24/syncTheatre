@@ -11,16 +11,24 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-    res.status(501).json({ status : "Not Yet Implemented "})
+    //parse room ID from url
+    let roomID = req.params.id;
+    let room = new RoomModel();
+    room.retrieve(roomID).then((room) => {
+        res.status(200).json(room);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json({error : "RoomID not found."});
+    })
 });
 
 router.post('/', (req, res) => {
     let founderID = req.body.founderID || 1;
-    let room = new RoomModel(founderID);
+    let room = new RoomModel();
+    room.founderID = founderID
     room.save().then((result) => {
-        res.status(201).json({
-            created : true
-        })
+        res.status(201).json(result)
     })
     .catch((err) => {
         console.error(err)
@@ -35,5 +43,10 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
     res.status(501).json({ status : "Not Yet Implemented"})
 });
+
+router.post('/addVideo', (req, res) => {
+
+});
+
 
 module.exports = router;
