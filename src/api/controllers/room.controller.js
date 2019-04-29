@@ -5,9 +5,18 @@
 let express = require('express');
 let router = express.Router();
 let RoomModel = require('../models/room.model');
+let mongoUtil = require('../mongo.util');
 
 router.get('/', (req, res) => {
-    res.status(501).json({ status : "Not Yet Implemented "})
+    mongoUtil.getConnection().collection('rooms').find({},{ projection: {_id:0}}).limit(10).toArray((err, docs) => {
+        if(err){
+            console.error(err);
+            res.status(400).json({ error : "Could not find any rooms. Database connection issues. Sorry!"})
+        }
+        else{
+            res.status(200).json(docs);
+        }
+    })
 });
 
 router.get('/:id', (req, res) => {
@@ -24,7 +33,7 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    let founderID = req.body.founderID || 1;
+    let founderID = req.body.founderID || -1;
     let room = new RoomModel();
     room.founderID = founderID
     room.save().then((result) => {

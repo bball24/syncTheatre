@@ -1,17 +1,26 @@
 var mongoUtil = require( '../mongo.util' );
+let UserModel = require('./user.model');
+
+const RoomStatus = {
+    NEW : 'new',
+    ACTIVE : 'active',
+    DELETING: 'deleting'
+};
 
 // room model code would go in here
 class Room {
     constructor(){
-        this.founderID = null;
         this.roomID = null;
+
+        this.founderID = null;
+        this.partyLeaderID = null;
+
         this.webSocket = null;
         this.users = [];
         this.videoQueue = [];
-        this.currentVideo = null;
-        this.roomStatus = null;
-        this.partyLeaderID = null;
-        this.createdAt = null;
+        this.currentVideo = "";
+        this.roomStatus = RoomStatus.NEW;
+        this.createdAt = Date.now();
 
         this.db = mongoUtil.getConnection();
         this.viewOptions = [
@@ -46,31 +55,53 @@ class Room {
         };
     }
 
+    getFounderID(){
+        let self = this;
+        return new Promise((resolve, reject) => {
+            // if founderID was not given, then create a temp user for this person
+            if (self.founderID === -1) {
+                new UserModel(true).save()
+                .then((userDoc) => {
+                    resolve(userDoc.userID);
+                })
+                .catch((err) => {
+                    reject({ error: err, message : "Could not create temp user"});
+                })
+            }
+            else {
+                // User was a registered user, we can just use his ID!
+                resolve(self.founderID);
+            }
+        });
+    }
+
     // ----- Databasing Methods ---------
     save(){
+        let self = this;
         return new Promise((resolve, reject) => {
-            this.generateRoomID().then((roomID) => {
-                this.roomID = roomID;
-                let room = this.toJson();
-                this.db.collection("rooms").insertOne(room, (err, result) => {
-                    if(err){
-                        reject(err);
-                    }
-                    else{
-                        resolve(result.ops.pop());
-                    }
+            self.getFounderID()
+            .then((founderID) => {
+                self.founderID = founderID;
+                self.partyLeaderID = founderID;
+                return self.generateRoomID();
+            })
+            .then((roomID) => {
+                self.roomID = roomID;
+                let room = self.toJson();
+                self.db.collection("rooms").insertOne(room, { projection: {_id:0}}, (err, result) => {
+                    if(err) reject(err);
+                    else resolve(result.ops.pop());
                 });
             })
             .catch((err) => {
                 reject(err)
             })
-
         })
     }
 
     retrieve(id){
         return new Promise((resolve, reject) => {
-            this.db.collection('rooms').findOne({roomID:Number(id)}, (err, doc) => {
+            this.db.collection('rooms').findOne({roomID:Number(id)}, { projection: {_id:0}}, (err, doc) => {
                 if(err){
                     reject(err);
                 }
@@ -96,11 +127,6 @@ class Room {
     getPartyLeaderID(){
 
     }
-
-    getFounderID(){
-
-    }
-
 
     getCurrentVideo(){
 
