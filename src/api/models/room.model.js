@@ -1,3 +1,4 @@
+let socketio = require('../sockets');
 var mongoUtil = require( '../mongo.util' );
 let UserModel = require('./user.model');
 
@@ -14,8 +15,8 @@ class Room {
 
         this.founderID = null;
         this.partyLeaderID = null;
-
-        this.webSocket = null;
+        
+        this.syncRoom = null;
         this.users = [];
         this.videoQueue = [];
         this.currentVideo = "";
@@ -44,8 +45,8 @@ class Room {
     toJson(){
         return {
             roomID : this.roomID,
-            webSocket : this.webSocket,
             users : this.users,
+            syncRoom : this.syncRoom,
             videoQueue : this.videoQueue,
             currentVideo : this.currentVideo,
             roomStatus : this.roomStatus,
@@ -87,6 +88,7 @@ class Room {
             })
             .then((roomID) => {
                 self.roomID = roomID;
+                self.syncRoom = 'syncRoom' + roomID;
                 let room = self.toJson();
                 self.db.collection("rooms").insertOne(room, { projection: {_id:0}}, (err, result) => {
                     if(err) reject(err);
@@ -119,10 +121,16 @@ class Room {
 
     // ---- Custom Room Functionality ---
 
-    connectUser(userID){
-
+    connectSocket(){
+        const roomSocket = socketio.getRoomSocket()
+        roomSocket.to(this.syncRoom).emit('MSG', "Hello World");
+        setInterval(()=>{this.syncTick(roomSocket)}, 1500);
     }
 
+    syncTick(socket){
+        const url = 'https://www.youtube.com/watch?v=ussCHoQttyQ' + Date.now();
+        socket.to(this.syncRoom).emit('PLAY', url);
+    }
 
     getPartyLeaderID(){
 

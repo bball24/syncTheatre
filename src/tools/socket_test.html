@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.dev.js'></script>
+    <script type='text/javascript'>
+        var roomID = 2;
+        var roomSocket = io.connect('http://localhost:3000/rooms');
+
+        var syncTick= function(socket){
+            socket.emit("GLOBAL", "Client is sending data " + Date.now())
+        };
+        roomSocket.on('connect', () => {
+            console.log('connected, okay!');
+
+            roomSocket.emit('JOIN', roomID)
+
+            roomSocket.on('MSG', (data) => {
+                console.log("[MSG] data: " + data);
+            })
+
+            roomSocket.on('PLAY', (data) => {
+                console.log("[PLAY] url: " + data);
+            })
+
+            setInterval(() => {syncTick(roomSocket)}, 1500);
+        });
+
+
+
+
+    </script>
+</head>
+<body>
+</body>
+</html>

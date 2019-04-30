@@ -32,11 +32,13 @@ router.get('/:id', (req, res) => {
     })
 });
 
+// Create Room
 router.post('/', (req, res) => {
     let founderID = req.body.founderID || -1;
     let room = new RoomModel();
     room.founderID = founderID
     room.save().then((result) => {
+        room.connectSocket();
         res.status(201).json(result)
     })
     .catch((err) => {
