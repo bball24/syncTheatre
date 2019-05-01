@@ -59,6 +59,60 @@ Then start the API
 - `DELETE /api/users/:id` delete one user
 
 
+## SyncControl Protocol
+
+Server Events
+A client can send the following request events to the server to join a room, obtain info, etc
+
+**Request Events**
+The *server* has a handler for each of these events. The client *sends* these events to the server.
+
+`join`
+data: `<number>` room ID
+Response: none
+Description: joins a room specified by roomID. Client socket can now listen to all events on the room.
+
+`reqVideo`
+data: none
+Response: `<event> resVideo`
+Description: prompts the server to emit a resVideo event, which returns
+
+`sync`
+data: `<object> { curTime : <number>, userID: <number> }`
+Response: none
+Description: Handles a sync event by recording the time the user is at on the video.
+
+
+**Response Events**
+The *client* should have a handler for each of these events. The *server* sends these events to the client.
+
+`resVideo`
+data: `<string>` youtube Video ID
+Description: Server emits an event containing the currently playing youtube video ID.
+
+`playVideo`
+data: none
+Description: An event alerting the clients that they should play the youtube player
+
+`loadVideo`
+data: `<string>` youtube video ID
+description: An event alerting the clients that they should load the video id in data.
+
+`pauseVideo`
+data : none
+description: An event alerting the clients that they should pause the player.
+
+`seekVideo`
+data : `<number>` time to seek the player to.
+Description: An event alerting the clients that they should seek to time in data.
+
+`changeSpeed`
+data: `<number>` the modifier to set the player speed to
+Description: An event alerting the clients to change their playback speed to modifier in data.
+
+
+
+
 
 
 

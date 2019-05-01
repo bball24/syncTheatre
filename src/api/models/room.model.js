@@ -119,6 +119,11 @@ class Room {
     syncTick(socket){
         const url = 'https://www.youtube.com/watch?v=ussCHoQttyQ' + Date.now();
         socket.to(this.syncRoom).emit('PLAY', url);
+
+        socket.on('requestVideo', () => {
+            console.log("client requested video");
+            socket.emit('sendVideo')
+        })
     }
 
     getPartyLeaderID(){
