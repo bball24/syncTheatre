@@ -24,17 +24,6 @@ class Room {
         this.createdAt = Date.now();
 
         this.db = mongoUtil.getConnection();
-        this.viewOptions = [
-            'roomID',
-            'founderID',
-            'webSocket',
-            'users',
-            'videoQueue',
-            'currentVideo',
-            'roomStatus',
-            'partyLeaderID',
-            'createdAt'
-        ];
     }
 
     generateRoomID(){
