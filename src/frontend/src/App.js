@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
-import "./App.css";
+import "./App.scss";
 import Routes from "./Routes";
 import { FaHome } from "react-icons/fa";
 
