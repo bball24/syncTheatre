@@ -1,37 +1,58 @@
-var mongoUtil = require( '../mongo.util' );
+let mongoUtil = require( '../mongo.util' );
 
 class User {
-    constructor(name){
+    constructor(isGuest){
         this.userID = null;
-        this.name = name;
-        this.createdAt = null;
-        this.rooms = []
+        this.userName = "";
+        this.passwordHash = "";
+        this.createdAt = Date.now();
+        this.rooms = [];
+        this.isGuest = isGuest;
 
         this.db = mongoUtil.getConnection();
     }
 
     // ----- Databasing Methods ---------
 
+    generateUserID(){
+        return mongoUtil.getNextID("userID");
+    }
+
     toJson(){
         return {
             userID : this.userID,
-            name : this.name,
+            userName : this.userName,
+            passwordHash : this.passwordHash,
             rooms : this.rooms,
+            isGuest : this.isGuest,
             createdAt : this.createdAt
         }
     }
 
     save(){
         return new Promise((resolve, reject) => {
-            let user = this.toJson()
-            this.db.collection("users").insertOne(user, (err, result) => {
-                if(err){
+            let user = this.toJson();
+            if (!user.userID){
+                this.generateUserID().then((userID) => {
+                    if(user.isGuest){
+                        user.userID = userID
+                        user.userName = "AnonUser#" + this.userID;
+                        user.passwordHash = "*";
+                    }
+
+                    this.db.collection("users").insertOne(user, (err, result) => {
+                        if(err){
+                            reject(err);
+                        }
+                        else{
+                            resolve(result.ops.pop());
+                        }
+                    });
+                })
+                .catch((err) => {
                     reject(err);
-                }
-                else{
-                    resolve(result);
-                }
-            });
+                })
+            }
         })
     }
 
@@ -45,3 +66,5 @@ class User {
 
     }
 }
+
+module.exports = User;
