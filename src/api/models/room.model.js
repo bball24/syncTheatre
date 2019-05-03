@@ -193,12 +193,12 @@ class Room {
     }
 
     enqueueVideo(videoID){
-        videoQueue.push(videoID);
+        this.videoQueue.push(videoID);
     }
 
     dequeueVideo(videoID){
-        if(!videoQueue.isEmpty()){
-            videoQueue.shift(videoID);    
+        if(!this.videoQueue.isEmpty()){
+            this.videoQueue.shift(videoID);
         }
     }
 

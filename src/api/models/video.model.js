@@ -1,13 +1,13 @@
-var mongoUtil = require( '../mongo.util' );
+const mongoUtil = require( '../mongo.util' );
+const qs = require('querystring');
 
 class Video{
-    constructor(videoURL){
+    constructor(videoURL, userID){
         this.videoURL = videoURL;
-        this.videoStart = null;
-        this.videoEnd = null;
+        this.videoID = "";
+        this.userID = userID;
 
-        this.db = mongoUtil.getConnection();
-        this.nextId = mongoUtil.getNextID;
+        this.parseVideoURL();
     }
 
     // ----- Databasing Methods ---------
@@ -15,9 +15,8 @@ class Video{
     toJson(){
         return {
             videoURL : this.videoURL,
-            videoStart : this.videoStart,
-            videoEnd : this.videoEnd
-        }
+            videoID : this.videoID
+        };
     }
 
     save(){
@@ -40,20 +39,16 @@ class Video{
 
     // ---- Custom Video Functionality ---
 
-    // Returns start and end times
-    getTimes(){
-
+    parseVideoURL(){
+        let strippedURL = this.videoURL.replace(/^.*\?/, '');
+        let parse = qs.parse(strippedURL);
+        this.videoID = parse.v;
     }
 
-    play(){
-
+    getVideoID(){
+        return this.videoID;
     }
 
-    pause(){
-
-    }
-
-    seek(){
-
-    }
 }
+
+module.exports = Video;

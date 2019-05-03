@@ -81,30 +81,23 @@ router.delete('/:id', (req, res) => {
 
 
 router.post('/addVideo', (req, res) => {
-	//step 1: Get past data from req
+	//step 1: Get post data from req
 	let roomID = req.body.roomID;
 	let userID = req.body.userID;
 	let videoURL = req.body.videoURL;
 
 	//step 2: Instantiate video model
-	let video = new VideoModel(videoURL);
+	let video = new VideoModel(videoURL, userID);
 
-	//step 3: instantiate room model and find room object by ID in mongoDB
-    let room = new RoomModel();
-    room.retrieve(roomID).then((room) => {
-    	//step 4: add video to room's queue
-    	room.enqueueVideo(videoURL)
-        res.status(200).json(room);
-    })
-    .catch((err) => {
-        console.error(err);
-        res.status(400).json({error : "RoomID not found."});
-    })
+	//refactor using factory
+	RoomModelFactory.getRoom(roomID).then((room) => {
+	    let videoID = video.getVideoID();
+	    room.enqueueVideo(videoID);
 
-    //Step 5: Save room model
-    room.save().then((result) => {
-        room.connectSocket();
-        res.status(201).json(result)
+        return RoomModelFactory.updateRoom(roomID, room.toJson());
+    })
+    .then((room) => {
+        res.status(200).json(room.toJson());
     })
     .catch((err) => {
         console.error(err)
