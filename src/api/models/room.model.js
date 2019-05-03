@@ -193,11 +193,13 @@ class Room {
     }
 
     enqueueVideo(videoID){
-
+        videoQueue.push(videoID);
     }
 
-    removeVideo(videoID){
-
+    dequeueVideo(videoID){
+        if(!videoQueue.isEmpty()){
+            videoQueue.shift(videoID);    
+        }
     }
 
     swapVideosInQueue(videoID1, videoID2){

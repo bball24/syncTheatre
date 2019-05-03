@@ -4,8 +4,10 @@
 
 let express = require('express');
 let router = express.Router();
+
 let RoomModel = require('../models/room.model').RoomModel;
 let RoomModelFactory = require('../models/room.model').RoomModelFactory;
+let VideoModel = require('../models/video.model');
 let mongoUtil = require('../mongo.util');
 
 //get all rooms up to limit
@@ -79,6 +81,37 @@ router.delete('/:id', (req, res) => {
 
 
 router.post('/addVideo', (req, res) => {
+	//step 1: Get past data from req
+	let roomID = req.body.roomID;
+	let userID = req.body.userID;
+	let videoURL = req.body.videoURL;
+
+	//step 2: Instantiate video model
+	let video = new VideoModel(videoURL);
+
+	//step 3: instantiate room model and find room object by ID in mongoDB
+    let room = new RoomModel();
+    room.retrieve(roomID).then((room) => {
+    	//step 4: add video to room's queue
+    	room.enqueueVideo(videoURL)
+        res.status(200).json(room);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json({error : "RoomID not found."});
+    })
+
+    //Step 5: Save room model
+    room.save().then((result) => {
+        room.connectSocket();
+        res.status(201).json(result)
+    })
+    .catch((err) => {
+        console.error(err)
+        res.status(400).json(err);
+    })
+
+    //Note: states and responses are shown above
 
 });
 
