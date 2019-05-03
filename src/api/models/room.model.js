@@ -1,7 +1,5 @@
-let socketio = require('../sockets');
 var mongoUtil = require( '../mongo.util' );
 let UserModel = require('./user.model');
-let snycLib = require('../lib/sync.lib');
 
 const RoomStatus = {
     NEW : 'new',
@@ -177,20 +175,13 @@ class Room {
     // ---- Custom Room Functionality ---
 
     connectSocket(){
-        const roomSocket = socketio.getRoomSocket()
-        roomSocket.in(this.syncRoom).on('reqVideo', snycLib.reqVideo);
-        roomSocket.in(this.syncRoom).on('sync', snycLib.sync)
-        setInterval(()=>{this.syncTick(roomSocket)}, 1500);
+        //setInterval(()=>{this.syncTick(roomSocket)}, 1500);
     }
 
     syncTick(socket){
         const url = 'https://www.youtube.com/watch?v=ussCHoQttyQ' + Date.now();
         socket.to(this.syncRoom).emit('PLAY', url);
 
-        socket.on('requestVideo', () => {
-            console.log("client requested video");
-            socket.emit('sendVideo')
-        })
     }
 
     getPartyLeaderID(){

@@ -5,15 +5,16 @@
 //from https://stackoverflow.com/questions/9709912/separating-file-server-and-socket-io-logic-in-node-js
 
 const socketio = require('socket.io');
-let roomSocket;
+const syncLib = require('./lib/sync.lib');
+let io;
 
 module.exports = {
     listen : function(app){
-        let io = socketio.listen(app);
-        roomSocket = io.of('/rooms');
+        io = socketio.listen(app);
+        let socket = io.of('/rooms');
 
-        roomSocket.on('connection', (client) => {
-            console.log('New client connected to rooms socket.')
+        socket.on('connection', (client) => {
+            console.log('>[WS] :: New client connected.')
 
             /** join Event
              * joins a room specified by roomID
@@ -22,17 +23,23 @@ module.exports = {
                 let roomName = 'syncRoom' + roomID
                 client.join(roomName);
                 console.log("[join] Room " + roomName);
-
-                //print roomName
-                //console.log(Object.keys(client.rooms));
             });
 
-        })
+            client.on('pauseVideo', (roomID, userID) => {syncLib.pauseVideo(roomID, userID, client)});
+            client.on('playVideo', (roomID, userID) => {syncLib.playVideo(roomID, userID, client)});
+            client.on('reqVideo', () => {syncLib.reqVideo(client)});
+            client.on('sync', (roomID, userID, curTime) => { syncLib.sync(roomID, userID, curTime)});
+            client.on('seekVideo', (roomID, userID, time) => {syncLib.seekVideo(roomID, userID, time, client)});
+        });
+
+
+
+
 
         return io;
     },
 
-    getRoomSocket : function(){
-        return roomSocket;
+    getSocket : function(){
+        return io;
     }
 }
