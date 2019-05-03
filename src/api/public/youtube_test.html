@@ -28,7 +28,6 @@
         console.log('connected, okay!');
 
         roomSocket.emit('join', roomID, userID);
-        roomSocket.emit('reqVideo', roomID);
 
         //setInterval(() => {syncTick(roomSocket)}, 1500);
     });
@@ -37,12 +36,6 @@
         console.error(err);
     })
 
-
-
-    roomSocket.on('loadVideo', function(youtubeID){
-        console.log('[h][loadVideo] load received for youtubeID: ' + youtubeID)
-        player.loadVideoById(youtubeID, 0, "default");
-    })
 
     roomSocket.on('changeSpeed', function(speed){
         console.log('[h][changeSpeed] change speed received speed: ' + speed);
@@ -66,7 +59,8 @@
             videoId: 'ussCHoQttyQ',
             events: {
                 'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                'onStateChange': onPlayerStateChange,
+                'onError' : onPlayerError
             }
         });
     }
@@ -74,6 +68,13 @@
     // 4. The API will call this function when the video player is ready.
     function onPlayerReady(event) {
         event.target.pauseVideo();
+
+        roomSocket.emit('reqVideo', roomID);
+
+        roomSocket.on('resVideo', function(youtubeID){
+            console.log('[h][resVideo] youtubeID: ' + youtubeID + ' is being played in the room.');
+            event.target.loadVideoById(youtubeID, 0, "default");
+        })
     }
 
     // 5. The API calls this function when the player's state changes.
@@ -101,6 +102,14 @@
         //if (event.data == YT.PlayerState.)
     }
 
+    function onPlayerError(event){
+        if(event.data != 2){
+            console.error(event);
+            roomSocket.emit('doneVideo', roomID, userID);
+        }
+
+    }
+
 
     roomSocket.on('playVideo', function(){
         console.log('[h][playVideo] play received');
@@ -117,10 +126,11 @@
         player.seekTo(time);
     })
 
-    roomSocket.on('resVideo', function(youtubeID){
-        console.log('[h][resVideo] youtubeID: ' + youtubeID + ' is being played in the room.');
-        player.loadVideoById(youtubeID);
+    roomSocket.on('loadVideo', function(videoID){
+        player.loadVideoById(videoID, 0, "default");
     })
+
+
 
 
 

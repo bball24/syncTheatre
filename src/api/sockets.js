@@ -21,6 +21,7 @@ module.exports = {
 
             /** Sync Control Server Event Handlers **/
             // See documentation in README.md for the available events
+            // https://stackoverflow.com/questions/24100218/socket-io-send-packet-to-sender-only/38933590
             client.on('join', (roomID, userID) => {syncLib.join(roomID, userID, client)});
             client.on('pauseVideo', (roomID, userID) => {syncLib.pauseVideo(roomID, userID, client)});
             client.on('playVideo', (roomID, userID) => {syncLib.playVideo(roomID, userID, client)});
@@ -28,7 +29,7 @@ module.exports = {
             client.on('sync', (roomID, userID, curTime) => { syncLib.sync(roomID, userID, curTime)});
             client.on('seekVideo', (roomID, userID, time) => {syncLib.seekVideo(roomID, userID, time, client)});
             client.on('disconnect', (client) => {syncLib.customDisconnect(client)});
-            client.on('doneVideo', (roomID, userID) => {syncLib.doneVideo(roomID, userID, client)});
+            client.on('doneVideo', (roomID, userID) => {syncLib.doneVideo(roomID, userID, socket)});
 
 
             _client = client;

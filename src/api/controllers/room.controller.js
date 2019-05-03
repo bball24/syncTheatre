@@ -87,13 +87,17 @@ router.post('/addVideo', (req, res) => {
 	let videoURL = req.body.videoURL;
 
 	//step 2: Instantiate video model
-	let video = new VideoModel(videoURL, userID);
+    let videos = []
+    videoURL.forEach((url) => {
+        videos.push(new VideoModel(url, userID));
+    })
 
 	//refactor using factory
 	RoomModelFactory.getRoom(roomID).then((room) => {
-	    let videoID = video.getVideoID();
-	    room.enqueueVideo(videoID);
-
+        videos.forEach((video) => {
+            let videoID = video.getVideoID();
+            room.enqueueVideo(videoID);
+        })
         return RoomModelFactory.updateRoom(roomID, room.toJson());
     })
     .then((room) => {

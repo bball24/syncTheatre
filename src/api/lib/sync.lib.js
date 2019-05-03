@@ -34,7 +34,7 @@ module.exports = {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
 
-        console.log("[join] Room " + roomName);
+        console.log(">[WS][join] Room " + roomName);
         RoomModelFactory.getRoom(roomID).then((room) => {
             return RoomModelFactory.updateRoom(roomID, room.toJson());
         })
@@ -44,17 +44,17 @@ module.exports = {
     },
 
     customDisconnect : (client) => {
-        console.log('[h][customDC] :: Client disconnected');
+        console.log('>[WS][customDC] :: Client disconnected');
 
 
     },
 
     sync : (roomID, userID, curTime) => {
-        //console.log('[h][sync] :: from ' + userID + ' at ' + curTime);
+        //console.log('>[WS][sync] :: from ' + userID + ' at ' + curTime);
     },
 
     reqVideo : (roomID, client) => {
-        console.log('[h][reqVideo] :: sending resVideo event to client');
+        console.log('>[WS][reqVideo] :: sending resVideo event to client');
         RoomModelFactory.getRoom(roomID).then((room) => {
             let youtubeID = room.getCurrentVideo();
             client.emit('resVideo', youtubeID);
@@ -67,24 +67,21 @@ module.exports = {
 
     //@TODO
     loadVideo : () => {
-        console.log('[e][loadVideo] :: ');
+        console.log('>[WS][loadVideo] :: ');
     },
 
     //@TODO
     changeSpeed : () => {
-        console.log('[e][changeSpeed]');
+        console.log('>[WS][changeSpeed]');
     },
 
 
     playVideo : (roomID, userID, client) => {
-        console.log('[e][playVideo] :: in roomID:' + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
+                console.log('>[WS][playVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('playVideo');
-            }
-            else{
-                console.log(userID + " tried to send a command in roomID: " + roomID);
             }
         })
         .catch((err) => {
@@ -94,14 +91,11 @@ module.exports = {
     },
 
     pauseVideo : (roomID, userID, client) => {
-        console.log('[e][pauseVideo] :: in roomID:' + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
+                console.log('>[WS][pauseVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('pauseVideo');
-            }
-            else{
-                console.log(userID + " tried to send a command in roomID: " + roomID);
             }
         })
         .catch((err) => {
@@ -111,14 +105,11 @@ module.exports = {
     },
 
     seekVideo : (roomID, userID, time, client) => {
-        console.log('[e][pauseVideo] :: from roomID: ' + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
+                console.log('>[WS][pauseVideo] :: from roomID: ' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('seekVideo', time);
-            }
-            else{
-                console.log(userID + " tried to send a command in roomID: " + roomID);
             }
         })
         .catch((err) => {
@@ -126,8 +117,8 @@ module.exports = {
         })
     },
 
-    doneVideo : (roomID, userID, client) => {
-        console.log('[e][doneVideo] :: from userID +' + userID + " in roomID: " + roomID);
+    doneVideo : (roomID, userID, socket) => {
+        console.log('>[WS][doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
@@ -135,7 +126,8 @@ module.exports = {
                 .then((room) => {
                     room.dequeueVideo();
                     let nextVideo = room.getCurrentVideo();
-                    client.broadcast.emit('loadVideo', nextVideo);
+                    socket.to(getRoomName(roomID)).emit('loadVideo', nextVideo);
+                    //client.broadcast.emit('loadVideo', nextVideo);
 
                     return RoomModelFactory.updateRoom(roomID, room.toJson());
                 })
@@ -145,9 +137,6 @@ module.exports = {
                 .catch((err) => {
                     console.error(err);
                 })
-            }
-            else{
-                console.log(userID + " tried to send a command in roomID: " + roomID);
             }
         })
         .catch((err) => {
