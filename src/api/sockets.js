@@ -15,18 +15,18 @@ module.exports = {
         roomSocket.on('connection', (client) => {
             console.log('New client connected to rooms socket.')
 
-            client.on("JOIN", (roomID) => {
+            /** join Event
+             * joins a room specified by roomID
+             */
+            client.on("join", (roomID) => {
                 let roomName = 'syncRoom' + roomID
-                client.join(roomName)
-                console.log("[JOIN] Room " + roomName);
+                client.join(roomName);
+                console.log("[join] Room " + roomName);
 
                 //print roomName
-                console.log(Object.keys(client.rooms));
-            })
+                //console.log(Object.keys(client.rooms));
+            });
 
-            client.on("GLOBAL", (data) => {
-                console.log("[GLOBAL] data: " + data);
-            })
         })
 
         return io;

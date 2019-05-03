@@ -64,6 +64,8 @@ mongoUtil.connect((err, client) => {
         db.createCollection('videos');
         db.createCollection('counters');
 
+        db.collection('rooms').createIndex({roomID : 1}, {unique : true});
+
         //init tables
         console.log(">[DB] :: Init Tables");
         db.collection('counters').insertOne({_id:"roomID",sequence_value:0})
