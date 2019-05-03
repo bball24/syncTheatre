@@ -10,10 +10,8 @@ const getRoomName = (roomID) => {
 
 const isPartyLeader = (roomID, userID) => {
     return new Promise((resolve, reject) => {
-        console.log(RoomModelFactory);
         RoomModelFactory.getRoom(roomID)
         .then((room) => {
-            console.log(room.partyLeaderID + " AND " + userID);
             if(Number(room.partyLeaderID) == Number(userID)){
 
                 resolve(true);
@@ -32,20 +30,51 @@ module.exports = {
 
     // Request Event Handlers
 
-    reqVideo : (client) => {
-        console.log('[h][reqVideo] :: sending resVideo event to client');
-        client.emit('resVideo', 'test#123abc');
+    join: (roomID, userID, client) => {
+        let roomName = 'syncRoom' + roomID
+        client.join(roomName);
+
+        console.log("[join] Room " + roomName);
+        RoomModelFactory.getRoom(roomID).then((room) => {
+            return RoomModelFactory.updateRoom(roomID, room.toJson());
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    },
+
+    customDisconnect : (client) => {
+        console.log('[h][customDC] :: Client disconnected');
+
+
     },
 
     sync : (roomID, userID, curTime) => {
         //console.log('[h][sync] :: from ' + userID + ' at ' + curTime);
     },
 
-    // Response Event Emitters
-
-    resVideo : (client) => {
+    reqVideo : (roomID, client) => {
+        console.log('[h][reqVideo] :: sending resVideo event to client');
+        RoomModelFactory.getRoom(roomID).then((room) => {
+            let youtubeID = room.getCurrentVideo();
+            client.emit('resVideo', youtubeID);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
 
     },
+
+    //@TODO
+    loadVideo : () => {
+        console.log('[e][loadVideo] :: ');
+    },
+
+    //@TODO
+    changeSpeed : () => {
+        console.log('[e][changeSpeed]');
+    },
+
 
     playVideo : (roomID, userID, client) => {
         console.log('[e][playVideo] :: in roomID:' + roomID);
@@ -62,10 +91,6 @@ module.exports = {
             console.error(err);
         })
 
-    },
-
-    loadVideo : () => {
-      console.log('[e][loadVideo] :: ');
     },
 
     pauseVideo : (roomID, userID, client) => {
@@ -101,7 +126,34 @@ module.exports = {
         })
     },
 
-    changeSpeed : () => {
-        console.log('[e][changeSpeed]');
+    doneVideo : (roomID, userID, client) => {
+        console.log('[e][doneVideo] :: from userID +' + userID + " in roomID: " + roomID);
+        isPartyLeader(roomID, userID)
+        .then((isLeader) => {
+            if(isLeader){
+                RoomModelFactory.getRoom(roomID)
+                .then((room) => {
+                    room.dequeueVideo();
+                    let nextVideo = room.getCurrentVideo();
+                    client.broadcast.emit('loadVideo', nextVideo);
+
+                    return RoomModelFactory.updateRoom(roomID, room.toJson());
+                })
+                .then(() => {
+
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+            }
+            else{
+                console.log(userID + " tried to send a command in roomID: " + roomID);
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     }
+
+
 }

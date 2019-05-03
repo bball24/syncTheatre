@@ -14,7 +14,6 @@ class Room {
 
         this.founderID = null;
         this.partyLeaderID = null;
-        
         this.syncRoom = null;
         this.users = [];
         this.videoQueue = [];
@@ -45,15 +44,15 @@ class Room {
     }
 
     fromJson(doc){
-        this.roomID = doc.roomID
-        this.users = doc.users
-        this.syncRoom = doc.syncRoom
-        this.videoQueue = doc.videoQueue
-        this.currentVideo = doc.currentVideo
-        this.roomStatus = doc.roomStatus
-        this.founderID = doc.founderID
-        this.partyLeaderID = doc.partyLeaderID
-        this.createdAt = doc.createdAt
+        this.roomID = doc.roomID;
+        this.users = doc.users;
+        this.syncRoom = doc.syncRoom;
+        this.videoQueue = doc.videoQueue;
+        this.currentVideo = doc.currentVideo;
+        this.roomStatus = doc.roomStatus;
+        this.founderID = doc.founderID;
+        this.partyLeaderID = doc.partyLeaderID;
+        this.createdAt = doc.createdAt;
     }
 
     /**
@@ -165,7 +164,7 @@ class Room {
                     resolve(doc)
                 }
                 else{
-                    reject("Doc with id "+ id+ "was not found.");
+                    reject({ error: "RoomID: "+ id+ " was not found in retrieve."});
                 }
 
             })
@@ -175,43 +174,60 @@ class Room {
     // ---- Custom Room Functionality ---
 
     connectSocket(){
-        //setInterval(()=>{this.syncTick(roomSocket)}, 1500);
+        //call the syncTick function every second (1000 ms)
+        let getSocket = require('../sockets').getSocket;
+        let getServer = require('../sockets').getServer;
+        //setInterval(()=>{this.syncTick(getSocket(), getServer())}, 1000);
     }
 
-    syncTick(socket){
-        const url = 'https://www.youtube.com/watch?v=ussCHoQttyQ' + Date.now();
-        socket.to(this.syncRoom).emit('PLAY', url);
+    syncTick(socket, server){
 
     }
 
     getPartyLeaderID(){
-
+        return this.partyLeaderID;
     }
 
     getCurrentVideo(){
-
+        return this.currentVideo;
     }
+
 
     enqueueVideo(videoID){
+        //if q is empty, set current vid to new vid then push it
+        if(this.videoQueue.length == 0){
+            this.currentVideo = videoID;
+        }
         this.videoQueue.push(videoID);
+
     }
 
-    dequeueVideo(videoID){
-        if(!this.videoQueue.isEmpty()){
-            this.videoQueue.shift(videoID);
+    dequeueVideo(){
+        //if q is non-empty remove the next vid and set as current vid
+        if(!this.videoQueue.length == 0){
+            this.currentVideo = this.videoQueue.shift();
         }
     }
 
-    swapVideosInQueue(videoID1, videoID2){
-
+    /**
+     * swapVideosInQueue
+     * Swaps two videos in the video queue
+     * This can be used to change priority of videos
+     * @param index1 (Number) index of video in queue
+     * @param index2 (Number) index of video in queue
+     */
+    swapVideosInQueue(index1, index2){
+        let temp = this.videoQueue[index1];
+        this.videoQueue[index1] = this.videoQueue[index2];
+        this.videoQueue[index2] = temp;
     }
 
     getRoomStatus(){
-
+        return this.roomStatus;
     }
 
     getCreationDate(){
-
+        return this.createdAt;
     }
 
 }

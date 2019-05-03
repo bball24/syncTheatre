@@ -107,6 +107,10 @@ Description: An event alerting the clients that they should seek to time in data
 data: `<number>` the modifier to set the player speed to  
 Description: An event alerting the clients to change their playback speed to modifier in data.
 
+`doneVideo`
+data : `<number>` userID
+Description: An event alerting the server that the user as specified by userID has completed.
+
 
 
 

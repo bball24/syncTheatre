@@ -27,8 +27,8 @@
     roomSocket.on('connect', () => {
         console.log('connected, okay!');
 
-        roomSocket.emit('join', roomID);
-        roomSocket.emit('reqVideo');
+        roomSocket.emit('join', roomID, userID);
+        roomSocket.emit('reqVideo', roomID);
 
         //setInterval(() => {syncTick(roomSocket)}, 1500);
     });
@@ -37,12 +37,11 @@
         console.error(err);
     })
 
-    roomSocket.on('resVideo', function(youtubeID){
-        console.log('[h][resVideo] youtubeID: ' + youtubeID + ' is being played in the room.');
-    })
+
 
     roomSocket.on('loadVideo', function(youtubeID){
         console.log('[h][loadVideo] load received for youtubeID: ' + youtubeID)
+        player.loadVideoById(youtubeID, 0, "default");
     })
 
     roomSocket.on('changeSpeed', function(speed){
@@ -64,7 +63,7 @@
         player = new YT.Player('player', {
             height: '390',
             width: '640',
-            videoId: 'TLPi6vgJpG0',
+            videoId: 'ussCHoQttyQ',
             events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
@@ -89,11 +88,14 @@
             roomSocket.emit('seekVideo', roomID, userID, curTime)
         }
         if (event.data == YT.PlayerState.PAUSED){
-            console.log("pausing local");
             roomSocket.emit('pauseVideo', roomID, userID);
 
             var curTime = player.getCurrentTime();
             roomSocket.emit('seekVideo', roomID, userID, curTime)
+        }
+
+        if (event.data == YT.PlayerState.ENDED){
+            roomSocket.emit('doneVideo', roomID, userID);
         }
 
         //if (event.data == YT.PlayerState.)
@@ -113,6 +115,11 @@
     roomSocket.on('seekVideo', function(time){
         console.log('[h][seekVideo] seek received time: ' + time);
         player.seekTo(time);
+    })
+
+    roomSocket.on('resVideo', function(youtubeID){
+        console.log('[h][resVideo] youtubeID: ' + youtubeID + ' is being played in the room.');
+        player.loadVideoById(youtubeID);
     })
 
 

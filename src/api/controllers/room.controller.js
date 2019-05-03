@@ -46,7 +46,6 @@ router.post('/', (req, res) => {
     let room = new RoomModel();
     room.founderID = founderID
     room.create().then((result) => {
-        room.connectSocket();
         res.status(201).json(result)
     })
     .catch((err) => {
@@ -68,6 +67,7 @@ router.put('/:id', (req, res) => {
     })
 });
 
+//delete room
 router.delete('/:id', (req, res) => {
     let id = req.params.id;
     RoomModelFactory.deleteRoom(id).then((result) => {
@@ -79,7 +79,7 @@ router.delete('/:id', (req, res) => {
     })
 });
 
-
+//add a video to a room
 router.post('/addVideo', (req, res) => {
 	//step 1: Get post data from req
 	let roomID = req.body.roomID;
@@ -103,9 +103,6 @@ router.post('/addVideo', (req, res) => {
         console.error(err)
         res.status(400).json(err);
     })
-
-    //Note: states and responses are shown above
-
 });
 
 
