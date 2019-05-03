@@ -270,6 +270,26 @@ class RoomModelFactory{
             })
         });
     }
+
+    static deleteRoom(id){
+        return new Promise((resolve, reject) => {
+            let query = { roomID : Number(id)};
+            console.log(query);
+            mongoUtil.getConnection().collection('rooms').deleteOne(query, (err, res) => {
+
+                if(err){
+                    reject(err);
+                }
+                else if(res.result.n === 0){
+                    console.log(res.result);
+                    reject(res.result);
+                }
+                else{
+                    resolve(res.result);
+                }
+            })
+        });
+    }
 }
 
 module.exports = {

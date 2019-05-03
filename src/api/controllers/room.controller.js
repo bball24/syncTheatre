@@ -61,18 +61,25 @@ router.put('/:id', (req, res) => {
         res.status(201).json(room.toJson());
     })
     .catch((err) => {
-        console.error(err);
-        res.status(400).json(err);
+        console.error("[ERR] :: " + err);
+        res.status(400).json({ error : err});
     })
 });
 
 router.delete('/:id', (req, res) => {
-    res.status(501).json({ status : "Not Yet Implemented"})
+    let id = req.params.id;
+    RoomModelFactory.deleteRoom(id).then((result) => {
+        res.status(200).json(result);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json(err)
+    })
 });
 
 
 router.post('/addVideo', (req, res) => {
-    
+
 });
 
 
