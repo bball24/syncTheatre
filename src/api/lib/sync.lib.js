@@ -33,7 +33,6 @@ module.exports = {
     join: (roomID, userID, client) => {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
-
         console.log(">[WS][join] Room " + roomName);
         RoomModelFactory.getRoom(roomID).then((room) => {
             return RoomModelFactory.updateRoom(roomID, room.toJson());
@@ -126,6 +125,7 @@ module.exports = {
                 .then((room) => {
                     room.dequeueVideo();
                     let nextVideo = room.getCurrentVideo();
+                    console.log('>[WS][loadVideo] emmit.');
                     socket.to(getRoomName(roomID)).emit('loadVideo', nextVideo);
                     //client.broadcast.emit('loadVideo', nextVideo);
 
