@@ -36,8 +36,8 @@ Then start the API
 
 **rooms**
 
-`GET /api/rooms/` - Get all rooms
-Making an HTTP GET request to `http://localhost:3001/api/rooms/` returns
+`GET /api/rooms/` - Get all rooms  
+Making an HTTP GET request to `http://localhost:3001/api/rooms/` returns  
 ```
 [
   {
@@ -65,8 +65,8 @@ Making an HTTP GET request to `http://localhost:3001/api/rooms/` returns
 ]
 ```
 
-`GET /api/rooms/:id` - Get one room
-Making an HTTP GET request to `http://localhost:3001/api/rooms/1` returns
+`GET /api/rooms/:id` - Get one room  
+Making an HTTP GET request to `http://localhost:3001/api/rooms/1` returns  
 ```
 {
   "roomID": 1,
@@ -81,8 +81,8 @@ Making an HTTP GET request to `http://localhost:3001/api/rooms/1` returns
 }
 ```
 
-`POST /api/rooms/` - create room
-If you know the userID of the user making the request you should post the following object
+`POST /api/rooms/` - create room  
+If you know the userID of the user making the request you should post the following object  
 
 ```
 {
@@ -90,8 +90,8 @@ If you know the userID of the user making the request you should post the follow
 }
 ```
 
-Making an HTTP POST request to `http://localhost:3001/api/rooms/`
- and optionally including the body described above creates a room and returns
+Making an HTTP POST request to `http://localhost:3001/api/rooms/`  
+ and optionally including the body described above creates a room and returns  
 ```
 {
   "roomID": 1,
@@ -107,12 +107,12 @@ Making an HTTP POST request to `http://localhost:3001/api/rooms/`
 }
 ```
 
-`PUT /api/rooms/:id` -  update one room
+`PUT /api/rooms/:id` -  update one room  
 You can include any valid fields you want in the body of the request. In the
 example given below the partyLeaderID and the state of the videoQueue are updated.
-The fields you choose to update **overwrite** the existing data.
+The fields you choose to update **overwrite** the existing data.  
 
-Example PUT Body
+Example PUT Body  
 ```
 {
   "partyLeaderID": 2,
@@ -121,8 +121,7 @@ Example PUT Body
 ```
 
 Making an HTTP PUT request to `http://localhost:3001/api/rooms/2`
-with the body described above updates room 2 and returns
-
+with the body described above updates room 2 and returns  
 ```
 {
   "roomID": 2,
@@ -140,10 +139,10 @@ with the body described above updates room 2 and returns
 }
 ```
 
-`DELETE /api/rooms/:id` - delete one room
-Deletes the room specified by roomID.
+`DELETE /api/rooms/:id` - delete one room  
+Deletes the room specified by roomID.  
 Making an HTTP DELETE request to `http://localhost:3001/api/rooms/2`
-deletes room with roomID 2 and returns
+deletes room with roomID 2 and returns  
 ```
 {
   "n": 1,
@@ -202,6 +201,6 @@ Description: An event alerting the clients that they should seek to time in data
 data: `<number>` the modifier to set the player speed to  
 Description: An event alerting the clients to change their playback speed to modifier in data.
 
-`doneVideo`
-data : `<number>` userID
+`doneVideo`  
+data : `<number>` userID  
 Description: An event alerting the server that the user as specified by userID has completed.
