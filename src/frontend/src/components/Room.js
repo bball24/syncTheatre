@@ -9,9 +9,9 @@ export default class Room extends React.Component {
 
     constructor(props){
         super(props);
-
-        const roomID = props.match.params.roomID;
-        const userID = props.userID;
+        console.log(this.props)
+        const roomID = this.props.match.params.roomID;
+        const userID = this.props.userID;
 
         //debug
         console.log({Page: 'Room', roomID: roomID, userID: userID});

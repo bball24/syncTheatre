@@ -26,17 +26,11 @@ class App extends Component {
                 }, () => {
                     sessionStorage.setItem('SyncTheatre:userID', JSON.stringify(this.state.userID));
                 });
-                console.log(this.state);
             })
             .catch((err) => {
                 console.error(err);
             });
         }
-        else{
-            console.log("Key was found then")
-            console.log(this.state);
-        }
-
     }
 
 
