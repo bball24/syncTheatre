@@ -36,7 +36,7 @@ class User {
                 this.generateUserID().then((userID) => {
                     if(user.isGuest){
                         user.userID = userID
-                        user.userName = "AnonUser#" + this.userID;
+                        user.userName = "AnonUser#" + user.userID;
                         user.passwordHash = "*";
                     }
 
@@ -45,7 +45,12 @@ class User {
                             reject(err);
                         }
                         else{
-                            resolve(result.ops.pop());
+                            user = result.ops.pop();
+                            resolve({
+                                userID : user.userID,
+                                userName : user.userName,
+                                isGuest : user.isGuest
+                            });
                         }
                     });
                 })
@@ -65,6 +70,7 @@ class User {
     getRooms(){
 
     }
+
 }
 
 module.exports = User;

@@ -5,10 +5,24 @@ import Login from "./components/Login"
 import Room from "./components/Room"
 import Signup from './components/Signup'
 
-export default () =>
-    <Switch>
-        <Route path="/" exact component={Home} />
-        <Route path='/signup' exact component={Signup}/>
-        <Route path="/login" exact component={Login} />
-        <Route path='/room' exact component={Room}/>
-    </Switch>;
+export default class Routes extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            userID : props.userID
+        };
+    }
+
+    render(){
+        return (<Switch>
+            <Route path="/" exact component={Home} />
+            <Route path='/signup' exact component={Signup}/>
+            <Route path="/login" exact component={Login} />
+            <Route
+                exact
+                path='/room/:roomID'
+                render={(props) => <Room {...props} userID={this.state.userID} />}
+            />
+        </Switch>);
+    }
+}
