@@ -8,12 +8,13 @@ const socketio = require('socket.io');
 const syncLib = require('./lib/sync.lib');
 let io;
 let _client;
+let socket;
 
 
 module.exports = {
     listen : function(app){
         io = socketio.listen(app);
-        let socket = io.of('/rooms');
+        socket = io.of('/rooms');
         let numClients = {};
 
         socket.on('connection', (client) => {
@@ -30,7 +31,7 @@ module.exports = {
             client.on('seekVideo', (roomID, userID, time) => {syncLib.seekVideo(roomID, userID, time, client)});
             client.on('disconnect', (client) => {syncLib.customDisconnect(client)});
             client.on('doneVideo', (roomID, userID) => {syncLib.doneVideo(roomID, userID, socket)});
-
+            client.on('updateQueue', (roomID, userID) => {syncLib.updateQueue(roomID, userID, socket)});
 
             _client = client;
         });
@@ -41,7 +42,7 @@ module.exports = {
     },
 
     getSocket : function(){
-        return _client;
+        return socket;
     },
 
     getServer : function(){

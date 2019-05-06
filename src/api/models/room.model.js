@@ -1,5 +1,6 @@
 var mongoUtil = require( '../mongo.util' );
 let UserModel = require('./user.model');
+let VideoModel = require('./video.model');
 
 const RoomStatus = {
     NEW : 'new',
@@ -197,6 +198,9 @@ class Room {
         //if q is empty, set current vid to new vid then push it
         if(this.videoQueue.length == 0){
             this.currentVideo = videoID;
+            let getSocket = require('../sockets').getSocket;
+            const socket = getSocket();
+            socket.to(this.syncRoom).emit('loadVideo', this.currentVideo);
         }
         this.videoQueue.push(videoID);
 
@@ -207,6 +211,25 @@ class Room {
         if(!this.videoQueue.length == 0){
             this.currentVideo = this.videoQueue.shift();
         }
+    }
+
+    getVideoQueue(){
+        return new Promise((resolve, reject) => {
+            let promises = [];
+            this.videoQueue.forEach((videoID) => {
+                let vid = new VideoModel("", -1);
+                vid.setVideoID(videoID);
+                promises.push(vid.getVideoDetails());
+            })
+            Promise.all(promises).then((vids) => {
+                resolve(vids);
+            })
+            .catch((err) => {
+                console.error(err);
+                reject(err);
+            })
+        })
+
     }
 
     /**
@@ -283,14 +306,12 @@ class RoomModelFactory{
     static deleteRoom(id){
         return new Promise((resolve, reject) => {
             let query = { roomID : Number(id)};
-            console.log(query);
             mongoUtil.getConnection().collection('rooms').deleteOne(query, (err, res) => {
 
                 if(err){
                     reject(err);
                 }
                 else if(res.result.n === 0){
-                    console.log(res.result);
                     reject(res.result);
                 }
                 else{

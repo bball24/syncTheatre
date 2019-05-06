@@ -2,6 +2,10 @@ import React from 'react';
 import YouTube from 'react-youtube';
 import openSocket from 'socket.io-client';
 import SyncLib from '../lib/sync-lib';
+import AddVideo from './AddVideo';
+import VideoQueue from './VideoQueue';
+import "./Room.scss"
+import axios from "axios"
 
 // https://youtu.be/dQw4w9WgXcQ
 
@@ -9,9 +13,8 @@ export default class Room extends React.Component {
 
     constructor(props){
         super(props);
-        console.log(this.props)
         const roomID = this.props.match.params.roomID;
-        const userID = this.props.userID;
+        let userID = this.props.userID;
 
         //debug
         console.log({Page: 'Room', roomID: roomID, userID: userID});
@@ -42,12 +45,16 @@ export default class Room extends React.Component {
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
-        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID)});
+        socket.on('loadVideo', (videoID) => {
+            this._videoQueueComponent.current.updateQueue();
+            lib.loadVideo(videoID)
+        });
         socket.on('error', (err) => {lib.onError(err)});
         socket.on('changeSpeed', (speed) => {lib.changeSpeed(speed)});
         socket.on('playVideo', () => {lib.playVideo()});
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
+        socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
 
 
         this.state = {
@@ -57,13 +64,17 @@ export default class Room extends React.Component {
             socket : socket,
             lib : lib,
             player : null,
+            apiHost : this.props.apiHost
         };
+
+        this._videoQueueComponent = React.createRef();
     }
 
     videoReady(event) {
         // access to player in all event handlers via event.target
         event.target.pauseVideo();
         this.state.lib.setPlayer(event.target);
+        this.state.lib.onPlayerReady(event);
     }
 
     render() {
@@ -75,18 +86,24 @@ export default class Room extends React.Component {
             }
         };
 
-        return (
-            <div className="Room">
-            <YouTube
-                videoId={this.state.videoID}
-                opts={opts}
-                onReady={this.videoReady}
-                onPlay={this.state.lib.onPlay}
-                onPause={this.state.lib.onPause}
-                onEnd={this.state.lib.onEnd}
-                onError={this.state.lib.onError}
-            />
-            </div>
-        );
+        return [
+            <div className="Room" key="wrapper">
+                <div className="YTWrapper">
+                    <YouTube
+                        className="YTWrapper"
+                        key="video"
+                        videoId={this.state.videoID}
+                        opts={opts}
+                        onReady={this.videoReady}
+                        onPlay={this.state.lib.onPlay}
+                        onPause={this.state.lib.onPause}
+                        onEnd={this.state.lib.onEnd}
+                        onError={this.state.lib.onError}
+                    />
+                </div>
+                <VideoQueue key="queue" ref={this._videoQueueComponent} userID={this.state.userID} roomID={this.state.roomID} apiHost={this.state.apiHost}/>
+            </div>,
+            <AddVideo key="form" socket={this.state.socket} userID={this.state.userID} roomID={this.state.roomID} apiHost={this.state.apiHost}/>
+        ];
     }
 }

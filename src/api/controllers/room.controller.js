@@ -109,5 +109,19 @@ router.post('/addVideo', (req, res) => {
     })
 });
 
+// get video queue for room specified by roomID
+router.get('/queue/:id', (req, res) => {
+    const roomID = req.params.id;
+    RoomModelFactory.getRoom(roomID).then((room) => {
+        return room.getVideoQueue();
+    })
+    .then((queue) => {
+        res.status(200).json({queue : queue});
+    })
+    .catch((err) => {
+        res.status(400).json(err);
+    })
+})
+
 
 module.exports = router;

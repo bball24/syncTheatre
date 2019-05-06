@@ -142,6 +142,16 @@ module.exports = {
         .catch((err) => {
             console.error(err);
         })
+    },
+
+    updateQueue: (roomID, userID, socket) => {
+        socket.to(getRoomName(roomID)).emit('updateQueue');
+        RoomModelFactory.getRoom(roomID).then((room) => {
+            let videoID = room.getCurrentVideo();
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     }
 
 

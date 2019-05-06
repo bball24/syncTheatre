@@ -38,7 +38,14 @@ export default class SyncLib {
 
     resVideo(event, youtubeID){
         console.log('[h][resVideo] youtubeID: ' + youtubeID + ' is being played in the room.');
-        event.target.loadVideoById(youtubeID, 0, "default");
+        if(youtubeID !== ""){
+            event.target.loadVideoById(youtubeID, 0, "default");
+        }
+        else{
+            event.target.loadVideoById('otHnRgZUs2I', 0, "default")
+        }
+        event.target.pauseVideo();
+
     }
 
     playVideo(){
@@ -61,8 +68,12 @@ export default class SyncLib {
         this.player.loadVideoById(videoID, 0, "default");
     }
 
+    updateQueue(component){
+        console.log('updating room queue');
+        component.current.updateQueue();
+    }
+
     onPlayerReady(event){
-        event.target.pauseVideo();
         this.socket.emit('reqVideo', this.roomID);
         this.socket.on('resVideo', (youtubeID) => {this.resVideo(event, youtubeID)});
     }

@@ -1,0 +1,30 @@
+/**
+ * Created by brett on 5/5/19.
+ */
+
+.VideoQueue{
+  //background-color: #f8f8f8;
+  //border: 1px solid #eeee;
+  float: right;
+}
+
+.VideoQueue img{
+  width:55px;
+  margin-right:5px;
+}
+.VideoQueue ul{
+  padding:0px 5px;
+  margin-top:5px;
+}
+
+.VideoQueue li{
+  font-size: 10px;
+  margin-bottom: 5px;
+  list-style: none;
+  border-bottom: 1px solid #f1f1f1;
+  padding: 0px 10px;
+}
+
+.VideoQueue li:hover{
+  background-color: #f7f7f7;
+}
