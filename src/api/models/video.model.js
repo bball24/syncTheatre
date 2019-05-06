@@ -1,29 +1,31 @@
-var mongoUtil = require( '../mongo.util' );
+const mongoUtil = require( '../mongo.util' );
+const qs = require('querystring');
+const axios = require('axios');
 
 class Video{
-    constructor(videoURL){
-        this.videoID = null;
+    constructor(videoURL, userID){
         this.videoURL = videoURL;
-        this.videoStart = null;
-        this.videoEnd = null;
+        this.videoID = "";
+        this.userID = userID;
+        this.youtubeAPIKey = 'AIzaSyADBtaDACU6KGQjJQ-oXsMtouAq7Ke3RuY';
 
-        this.db = mongoUtil.getConnection();
+        if(this.videoURL !== ""){
+            this.parseVideoURL();
+        }
     }
 
     // ----- Databasing Methods ---------
 
     toJson(){
         return {
-            videoID : this.videoID,
             videoURL : this.videoURL,
-            videoStart : this.videoStart,
-            videoEnd : this.videoEnd
-        }
+            videoID : this.videoID
+        };
     }
 
     save(){
         return new Promise((resolve, reject) => {
-            let video = this.toJson()
+            let video = this.toJson();
             this.db.collection("videos").insertOne(video, (err, result) => {
                 if(err){
                     reject(err);
@@ -41,20 +43,44 @@ class Video{
 
     // ---- Custom Video Functionality ---
 
-    // Returns start and end times
-    getTimes(){
+    parseVideoURL(){
+        let strippedURL = this.videoURL.replace(/^.*\?/, '');
+        let parse = qs.parse(strippedURL);
+        this.videoID = parse.v;
+    }
+
+
+    getVideoID(){
+        return this.videoID;
+    }
+
+    setVideoID(videoID){
+        this.videoID = videoID;
+    }
+
+    getVideoDetails(){
+        return new Promise((resolve, reject) => {
+            const baseUrl = "https://www.googleapis.com/youtube/v3/videos";
+            const part = "?part=snippet";
+            const videoID = "&id=" + this.videoID;
+            const apiKey = "&key="+ this.youtubeAPIKey;
+            const url = baseUrl + part + videoID + apiKey;
+            axios.get(url).then((data) => {
+                const details = {
+                    thumb : data.data.items[0].snippet.thumbnails.default,
+                    title : data.data.items[0].snippet.title
+                }
+                resolve(details);
+            })
+            .catch((err) => {
+                console.error(err);
+                reject({error : "GET failed to Youtube Data API"});
+            })
+        })
 
     }
 
-    play(){
-
-    }
-
-    pause(){
-
-    }
-
-    seek(){
-
-    }
 }
+
+
+module.exports = Video;

@@ -17,6 +17,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//allow x-origin form :3000
+// Add headers
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Pass to next layer of middleware
+    next();
+});
+
 // Routers
 app.use('/api', apiRouter);
 
@@ -49,9 +67,26 @@ mongoUtil.connect((err, client) => {
         console.log(">[DB] :: Connection to MongoDB Server Successful")
         console.log(">[DB] :: Creating Collection")
         let db = mongoUtil.getConnection();
+
+        //drop collections
+        console.log(">[DB] :: Dropping Tables");
+        db.collection('rooms').drop();
+        db.collection('users').drop();
+        db.collection('videos').drop();
+        db.collection('counters').drop();
+
+        //create collections
+        console.log(">[DB] :: Creating Tables");
         db.createCollection('rooms');
         db.createCollection('users');
         db.createCollection('videos');
+        db.createCollection('counters');
+
+        db.collection('rooms').createIndex({roomID : 1}, {unique : true});
+
+        //init tables
+        console.log(">[DB] :: Init Tables");
+        db.collection('counters').insertOne({_id:"roomID",sequence_value:0})
     }
 });
 

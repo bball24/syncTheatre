@@ -19,5 +19,20 @@ module.exports  ={
 
     getConnection : () => {
         return _db;
+    },
+
+    getNextID : (sequenceName) => {
+        return new Promise((resolve, reject) => {
+            _db.collection('counters').findOneAndUpdate({_id: sequenceName },{$inc:{sequence_value:1}}, {
+                    returnOriginal: false,
+                    upsert: true
+            }
+            , (err, res) => {
+                if(err) reject(err);
+                resolve(res.value.sequence_value);
+            });
+        });
+
+
     }
 };
