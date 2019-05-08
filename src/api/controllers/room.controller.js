@@ -10,7 +10,10 @@ let RoomModelFactory = require('../models/room.model').RoomModelFactory;
 let VideoModel = require('../models/video.model');
 let mongoUtil = require('../mongo.util');
 
+
+
 //get all rooms up to limit
+// localhost:3001/api/rooms/
 router.get('/', (req, res) => {
     let limit = 10
     RoomModelFactory.getAllRooms(limit)
@@ -28,6 +31,7 @@ router.get('/', (req, res) => {
 });
 
 //get one room
+// localhost:3001/api/rooms/10
 router.get('/:id', (req, res) => {
     //parse room ID from url
     let roomID = req.params.id;
@@ -41,6 +45,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Create Room
+// localhost:3001/api/rooms/
 router.post('/', (req, res) => {
     let founderID = req.body.founderID || -1;
     let room = new RoomModel();

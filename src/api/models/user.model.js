@@ -8,8 +8,15 @@ class User {
         this.createdAt = Date.now();
         this.rooms = [];
         this.isGuest = isGuest;
+        this.oauthID = "";
+        this.oauthURL = "";
 
         this.db = mongoUtil.getConnection();
+    }
+
+    registerUser(oauthID, oauthURL){
+        this.oauthID = oauthID;
+        this.oauthURL = oauthURL;
     }
 
     // ----- Databasing Methods ---------
@@ -25,8 +32,21 @@ class User {
             passwordHash : this.passwordHash,
             rooms : this.rooms,
             isGuest : this.isGuest,
-            createdAt : this.createdAt
+            createdAt : this.createdAt,
+            oauthID : this.oauthID,
+            oauthURL : this.oauthURL
         }
+    }
+
+    fromJson(doc){
+        this.userID = doc.userID;
+        this.userName = doc.userName;
+        this.passwordHash = doc.passwordHash;
+        this.rooms = doc.rooms;
+        this.isGuest = doc.isGuest;
+        this.createdAt = doc.createdAt;
+        this.oauthID = doc.oauthID;
+        this.oauthURL = doc.oauthURL;
     }
 
     save(){
