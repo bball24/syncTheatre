@@ -28,6 +28,20 @@ router.post('/temp', (req, res) => {
     })
 })
 
+router.post('/register', (req, res) => {
+    const userData = req.body;
+    const user = new UserModel(false);
+    user.registerUser(userData.userName, userData.oauthID, userData.oauthURL);
+    user.save().then((doc) => {
+        res.status(201).json(doc);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json(err);
+    })
+
+})
+
 router.put('/:id', (req, res) => {
     res.status(501).json({ status : "Not Yet Implemented"})
 });

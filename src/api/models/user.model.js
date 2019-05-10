@@ -4,7 +4,6 @@ class User {
     constructor(isGuest){
         this.userID = null;
         this.userName = "";
-        this.passwordHash = "";
         this.createdAt = Date.now();
         this.rooms = [];
         this.isGuest = isGuest;
@@ -14,9 +13,19 @@ class User {
         this.db = mongoUtil.getConnection();
     }
 
-    registerUser(oauthID, oauthURL){
+    registerUser(userName, oauthID, oauthURL){
+        this.userName = userName;
         this.oauthID = oauthID;
         this.oauthURL = oauthURL;
+    }
+
+    joinRoom(roomID){
+        this.rooms.push(roomID);
+        // add userID to room as well
+    }
+
+    authenticateUser(){
+
     }
 
     // ----- Databasing Methods ---------
@@ -29,7 +38,6 @@ class User {
         return {
             userID : this.userID,
             userName : this.userName,
-            passwordHash : this.passwordHash,
             rooms : this.rooms,
             isGuest : this.isGuest,
             createdAt : this.createdAt,
@@ -41,7 +49,6 @@ class User {
     fromJson(doc){
         this.userID = doc.userID;
         this.userName = doc.userName;
-        this.passwordHash = doc.passwordHash;
         this.rooms = doc.rooms;
         this.isGuest = doc.isGuest;
         this.createdAt = doc.createdAt;
@@ -54,8 +61,8 @@ class User {
             let user = this.toJson();
             if (!user.userID){
                 this.generateUserID().then((userID) => {
+                    user.userID = userID;
                     if(user.isGuest){
-                        user.userID = userID
                         user.userName = "AnonUser#" + user.userID;
                         user.passwordHash = "*";
                     }
@@ -66,11 +73,24 @@ class User {
                         }
                         else{
                             user = result.ops.pop();
-                            resolve({
-                                userID : user.userID,
-                                userName : user.userName,
-                                isGuest : user.isGuest
-                            });
+
+                            if(user.isGuest){
+                                resolve({
+                                    userID : user.userID,
+                                    userName : user.userName,
+                                    isGuest : user.isGuest,
+                                });
+                            }
+                            else{
+                                resolve({
+                                    userID : user.userID,
+                                    userName : user.userName,
+                                    isGuest : user.isGuest,
+                                    oauthID : user.oauthID,
+                                    oauthURL : user.oauthURL
+                                });
+                            }
+
                         }
                     });
                 })

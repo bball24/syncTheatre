@@ -162,7 +162,6 @@ class Room {
                     if(err){
                         reject(err);
                     }
-
                     if(doc){
                         self.fromJson(doc)
                         resolve(doc)
