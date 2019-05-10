@@ -4,6 +4,7 @@ import openSocket from 'socket.io-client';
 import SyncLib from '../lib/sync-lib';
 import AddVideo from './AddVideo';
 import VideoQueue from './VideoQueue';
+import ChatBox from './ChatBox';
 import "./Room.scss"
 import axios from "axios"
 
@@ -55,6 +56,10 @@ export default class Room extends React.Component {
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
         socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
+        socket.on('chatMessage', (userID, message) => {
+            console.log("[H] :: Msg recieved: " + message)
+            this._chatBox.current.addMessage(userID, message);
+        });
 
 
         this.state = {
@@ -68,6 +73,7 @@ export default class Room extends React.Component {
         };
 
         this._videoQueueComponent = React.createRef();
+        this._chatBox = React.createRef();
     }
 
     videoReady(event) {
@@ -101,9 +107,27 @@ export default class Room extends React.Component {
                         onError={this.state.lib.onError}
                     />
                 </div>
-                <VideoQueue key="queue" ref={this._videoQueueComponent} userID={this.state.userID} roomID={this.state.roomID} apiHost={this.state.apiHost}/>
+                <ChatBox
+                    key="chat"
+                    ref={this._chatBox}
+                    userID={this.state.userID}
+                    roomID={this.state.roomID}
+                    socket={this.state.socket}
+                />
             </div>,
-            <AddVideo key="form" socket={this.state.socket} userID={this.state.userID} roomID={this.state.roomID} apiHost={this.state.apiHost}/>
+            <VideoQueue
+                key="queue"
+                ref={this._videoQueueComponent}
+                userID={this.state.userID}
+                roomID={this.state.roomID}
+                apiHost={this.state.apiHost}
+            />,
+            <AddVideo
+                key="form"
+                socket={this.state.socket}
+                userID={this.state.userID}
+                roomID={this.state.roomID}
+                apiHost={this.state.apiHost}/>
         ];
     }
 }

@@ -10,7 +10,7 @@ import React from 'react';
 import axios from 'axios';
 import "./VideoQueue.scss";
 
-export default class AddVideo extends React.Component {
+export default class VideoQueue extends React.Component {
     constructor(props){
         super(props);
         this.state = {

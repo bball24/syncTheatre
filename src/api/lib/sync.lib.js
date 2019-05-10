@@ -152,6 +152,11 @@ module.exports = {
         .catch((err) => {
             console.error(err);
         })
+    },
+
+    chatMessage: (roomID, userID, socket, message) => {
+        console.log("[chatMessage] received in room " + roomID + " from user " + userID + " (" + message +")");
+        socket.to(getRoomName(roomID)).emit('chatMessage', userID, message);
     }
 
 
