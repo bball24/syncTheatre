@@ -19,17 +19,22 @@ module.exports = {
 
         socket.on('connection', (client) => {
             console.log('>[WS] :: New client connected.')
-
+            let socketUserID;
+            let socketRoomID;
             /** Sync Control Server Event Handlers **/
             // See documentation in README.md for the available events
             // https://stackoverflow.com/questions/24100218/socket-io-send-packet-to-sender-only/38933590
-            client.on('join', (roomID, userID) => {syncLib.join(roomID, userID, client)});
+            client.on('join', (roomID, userID) => {
+                socketUserID = userID;
+                socketRoomID = roomID;
+                syncLib.join(roomID, userID, client)}
+            );
             client.on('pauseVideo', (roomID, userID) => {syncLib.pauseVideo(roomID, userID, client)});
             client.on('playVideo', (roomID, userID) => {syncLib.playVideo(roomID, userID, client)});
             client.on('reqVideo', (roomID) => {syncLib.reqVideo(roomID, client)});
             client.on('sync', (roomID, userID, curTime) => { syncLib.sync(roomID, userID, curTime)});
             client.on('seekVideo', (roomID, userID, time) => {syncLib.seekVideo(roomID, userID, time, client)});
-            client.on('disconnect', (client) => {syncLib.customDisconnect(client)});
+            client.on('disconnect', (client) => {syncLib.customDisconnect(socketUserID, socketRoomID, socket)});
             client.on('doneVideo', (roomID, userID) => {syncLib.doneVideo(roomID, userID, socket)});
             client.on('updateQueue', (roomID, userID) => {syncLib.updateQueue(roomID, userID, socket)});
             client.on('sendMessage', (roomID, userID, message) => {syncLib.chatMessage(roomID, userID, socket, message)});

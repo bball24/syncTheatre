@@ -128,5 +128,15 @@ router.get('/queue/:id', (req, res) => {
     })
 })
 
+//get list of active users in room for specific roomID
+router.get('/users/:id', (req, res) => {
+    const roomID = req.params.id;
+    RoomModelFactory.getRoom(roomID).then((room) => {
+        return room.getUserList();
+    })
+    .then((userList) => {
+
+    })
+})
 
 module.exports = router;

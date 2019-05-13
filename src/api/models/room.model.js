@@ -194,6 +194,27 @@ class Room {
         return this.currentVideo;
     }
 
+    joinUser(userID){
+        this.users = [...this.users, userID];
+    }
+
+    disconnectUser(userID){
+        let users = [];
+        this.users.forEach((id) => {
+            if(id !== userID){
+                users.push(id)
+            }
+        });
+
+        this.users = users;
+    }
+
+    getUserList(){
+        return new Promise((resolve, reject) => {
+            let promises = [];
+
+        })
+    }
 
     enqueueVideo(videoID){
         //if q is empty, set current vid to new vid then push it

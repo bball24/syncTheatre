@@ -33,19 +33,32 @@ module.exports = {
     join: (roomID, userID, client) => {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
+        client.userID = userID;
         console.log(">[WS][join] Room " + roomName);
         RoomModelFactory.getRoom(roomID).then((room) => {
+            room.joinUser(userID);
             return RoomModelFactory.updateRoom(roomID, room.toJson());
+        })
+        .then((room) => {
+            socket.to(getRoomName(roomID)).emit('updateUsers');
         })
         .catch((err) => {
             console.error(err);
         })
     },
 
-    customDisconnect : (client) => {
-        console.log('>[WS][customDC] :: Client disconnected');
-
-
+    customDisconnect : (userID, roomID, socket) => {
+        console.log('>[WS][customDC] :: user ' + userID + ' disconnected from room ' + roomID);
+        RoomModelFactory.getRoom(roomID).then((room) => {
+            room.disconnectUser(userID);
+            return RoomModelFactory.updateRoom(roomID, room.toJson());
+        })
+        .then((room) => {
+            socket.to(getRoomName(roomID)).emit('updateUsers');
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     },
 
     sync : (roomID, userID, curTime) => {
