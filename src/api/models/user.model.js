@@ -101,7 +101,25 @@ class User {
         })
     }
 
-    retrieve(){
+    retrieve(id){
+        const self = this;
+        return new Promise((resolve, reject) => {
+            this.db.collection('user').findOne(
+                { userID : Number(id)},
+                { projection: {_id:0}},
+                (err, doc) => {
+                    if(err){
+                        reject(err);
+                    }
+                    if(doc){
+                        self.fromJson(doc)
+                        resolve(doc)
+                    }
+                    else{
+                        reject({ error: "UserID: "+ id+ " was not found in retrieve."});
+                    }
+            })
+        });
 
     }
 
