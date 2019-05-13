@@ -135,7 +135,12 @@ router.get('/users/:id', (req, res) => {
         return room.getUserList();
     })
     .then((userList) => {
-
+        console.log(userList);
+        res.status(200).json({ users: userList})
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json(err);
     })
 })
 

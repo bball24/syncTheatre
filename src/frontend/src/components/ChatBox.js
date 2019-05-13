@@ -5,6 +5,7 @@
 import React from 'react';
 import "./VideoQueue.scss";
 import SendChatMessage from './SendChatMessage';
+import RoomUsers from "./RoomUsers";
 
 export default class ChatBox extends React.Component {
     constructor(props){
@@ -13,8 +14,11 @@ export default class ChatBox extends React.Component {
             messages : [],
             userID : props.userID,
             roomID : props.roomID,
-            socket  : props.socket
+            socket  : props.socket,
+            apiHost : props.apiHost
         };
+
+        this._userList = React.createRef();
 
         //bindings
         this.addMessage = this.addMessage.bind(this);
@@ -38,6 +42,10 @@ export default class ChatBox extends React.Component {
         this.setState({
             messages : [...this.state.messages, msg]
         });
+    }
+
+    updateUserList(){
+        this._userList.current.updateUsers();
     }
 
     /**
@@ -72,6 +80,13 @@ export default class ChatBox extends React.Component {
      */
     render(){
         return[
+            <RoomUsers
+                key="userList"
+                ref={this._userList}
+                userID={this.state.userID}
+                roomID={this.state.roomID}
+                apiHost={this.state.apiHost}
+            />,
             <div key="chatWrap" className="chatBox">
                 <ul>
                     {this.renderMessages()}

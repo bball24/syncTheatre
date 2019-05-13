@@ -27,7 +27,7 @@ module.exports = {
             client.on('join', (roomID, userID) => {
                 socketUserID = userID;
                 socketRoomID = roomID;
-                syncLib.join(roomID, userID, client)}
+                syncLib.join(roomID, userID, client, socket)}
             );
             client.on('pauseVideo', (roomID, userID) => {syncLib.pauseVideo(roomID, userID, client)});
             client.on('playVideo', (roomID, userID) => {syncLib.playVideo(roomID, userID, client)});

@@ -212,7 +212,20 @@ class Room {
     getUserList(){
         return new Promise((resolve, reject) => {
             let promises = [];
-
+            this.users.forEach((userID) => {
+                let user = new UserModel(false);
+                promises.push(user.retrieve(userID));
+            });
+            Promise.all(promises).then((users) => {
+                let returnUsers = []
+                users.forEach((user) => {
+                    returnUsers.push({userID: user.userID, userName: user.userName});
+                });
+                resolve(returnUsers);
+            })
+            .catch((err) => {
+                reject(err);
+            })
         })
     }
 

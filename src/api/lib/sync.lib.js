@@ -30,7 +30,7 @@ module.exports = {
 
     // Request Event Handlers
 
-    join: (roomID, userID, client) => {
+    join: (roomID, userID, client, socket) => {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
         client.userID = userID;

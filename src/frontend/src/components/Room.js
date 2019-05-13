@@ -60,6 +60,9 @@ export default class Room extends React.Component {
             console.log("[H] :: Msg recieved: " + message)
             this._chatBox.current.addMessage(userID, message);
         });
+        socket.on('updateUsers', () => {
+            this._chatBox.current.updateUserList();
+        });
 
 
         this.state = {
@@ -110,6 +113,7 @@ export default class Room extends React.Component {
                 <ChatBox
                     key="chat"
                     ref={this._chatBox}
+                    apiHost = {this.state.apiHost}
                     userID={this.state.userID}
                     roomID={this.state.roomID}
                     socket={this.state.socket}
