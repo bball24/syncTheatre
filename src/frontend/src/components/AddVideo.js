@@ -32,7 +32,7 @@ export default class AddVideo extends React.Component {
         const postData = {
             userID : this.state.userID,
             roomID : this.state.roomID,
-            videoURL : [this.state.youtubeURL]
+            videoURL : this.state.youtubeURL
         }
         axios.post(this.state.apiHost + '/api/rooms/addVideo', postData)
         .then((data) => {

@@ -18,7 +18,7 @@ module.exports = {
         let numClients = {};
 
         socket.on('connection', (client) => {
-            console.log('>[WS] :: New client connected.')
+            syncLib.connected();
             let socketUserID;
             let socketRoomID;
             /** Sync Control Server Event Handlers **/

@@ -83,6 +83,7 @@ mongoUtil.connect((err, client) => {
         db.createCollection('counters');
 
         db.collection('rooms').createIndex({roomID : 1}, {unique : true});
+        db.collection('users').createIndex({ userName: "text"});
 
         //init tables
         console.log(">[DB] :: Init Tables");

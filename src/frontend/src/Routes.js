@@ -5,6 +5,7 @@ import Login from "./components/Login"
 import Room from "./components/Room"
 import Signup from './components/Signup'
 import CreateRoom from './components/CreateRoom';
+import PersistentRoom from "./components/PersistentRoom";
 
 export default class Routes extends React.Component {
     constructor(props){
@@ -21,6 +22,13 @@ export default class Routes extends React.Component {
             <Route path='/signup' exact component={Signup}/>
             <Route path="/login" exact component={Login} />
             <Route
+                exact
+                path="/user/:roomName"
+                render={(props) => <PersistentRoom {...props}
+                                         apiHost={this.state.apiHost}
+                                         userID={this.state.userID} />}
+            />
+            <Route
                 path="/room"
                 exact
                 render={(props) => <CreateRoom
@@ -32,7 +40,9 @@ export default class Routes extends React.Component {
             <Route
                 exact
                 path='/room/:roomID'
-                render={(props) => <Room {...props} apiHost={this.state.apiHost} userID={this.state.userID} />}
+                render={(props) => <Room {...props}
+                                         apiHost={this.state.apiHost}
+                                         userID={this.state.userID} />}
             />
         </Switch>);
     }

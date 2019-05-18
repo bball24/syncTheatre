@@ -63,9 +63,9 @@ export default class SyncLib {
         this.player.seekTo(time);
     }
 
-    loadVideo(videoID){
-        console.log('loading video ID:' + videoID)
-        this.player.loadVideoById(videoID, 0, "default");
+    loadVideo(video){
+        console.log('loading video:' + video)
+        this.player.loadVideoById(video.videoID, 0, "default");
     }
 
     updateQueue(component){
@@ -75,7 +75,9 @@ export default class SyncLib {
 
     onPlayerReady(event){
         this.socket.emit('reqVideo', this.roomID);
-        this.socket.on('resVideo', (youtubeID) => {this.resVideo(event, youtubeID)});
+        this.socket.on('resVideo', (youtubeID) => {
+            this.resVideo(event, youtubeID)
+        });
     }
 
     onPlayerError(event){

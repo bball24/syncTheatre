@@ -19,7 +19,7 @@ router.post('/', (req, res) => {
 });
 
 router.post('/temp', (req, res) => {
-    new UserModel(true).save()
+    new UserModel(true).createGuestUser()
     .then((userDoc) => {
         res.status(201).json(userDoc);
     })
@@ -32,15 +32,30 @@ router.post('/register', (req, res) => {
     const userData = req.body;
     const user = new UserModel(false);
     user.registerUser(userData.userName, userData.oauthID, userData.oauthURL);
-    user.save().then((doc) => {
+    user.createRegisteredUser().then((doc) => {
         res.status(201).json(doc);
     })
     .catch((err) => {
         console.error(err);
         res.status(400).json(err);
     })
-
 })
+
+router.get('/roomInfo/:userName', (req, res) => {
+    const userName = req.params.userName;
+    const user = new UserModel(false);
+    user.retrieveByName(userName).then((user) => {
+        if(user){
+            res.status(200).json({roomName: user.roomName, roomID: user.roomID, userID: user.userID});
+        }
+        else{
+            res.status(400).json({ error : "The userName " + userName + " was not found."});
+        }
+    })
+    .catch((err) => {
+        res.status(400).json(err);
+    })
+});
 
 router.put('/:id', (req, res) => {
     res.status(501).json({ status : "Not Yet Implemented"})

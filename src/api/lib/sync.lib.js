@@ -4,6 +4,13 @@
 
 const RoomModelFactory = require('../models/room.model').RoomModelFactory;
 
+const DEBUG_OUTPUT = false;
+const socketLog = (output) => {
+    if(DEBUG_OUTPUT){
+        console.log("--->[WS] :: " + output);
+    }
+}
+
 const getRoomName = (roomID) => {
     return 'syncRoom' + roomID;
 }
@@ -29,12 +36,15 @@ const isPartyLeader = (roomID, userID) => {
 module.exports = {
 
     // Request Event Handlers
+    connected : () => {
+        socketLog('>[WS] :: New client connected.');
+    },
 
     join: (roomID, userID, client, socket) => {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
         client.userID = userID;
-        console.log(">[WS][join] Room " + roomName);
+        socketLog(">[WS][join] Room " + roomName);
         RoomModelFactory.getRoom(roomID).then((room) => {
             room.joinUser(userID);
             return RoomModelFactory.updateRoom(roomID, room.toJson());
@@ -48,7 +58,7 @@ module.exports = {
     },
 
     customDisconnect : (userID, roomID, socket) => {
-        console.log('>[WS][customDC] :: user ' + userID + ' disconnected from room ' + roomID);
+        socketLog('>[WS][customDC] :: user ' + userID + ' disconnected from room ' + roomID);
         RoomModelFactory.getRoom(roomID).then((room) => {
             room.disconnectUser(userID);
             return RoomModelFactory.updateRoom(roomID, room.toJson());
@@ -62,11 +72,11 @@ module.exports = {
     },
 
     sync : (roomID, userID, curTime) => {
-        //console.log('>[WS][sync] :: from ' + userID + ' at ' + curTime);
+        //socketLog('>[WS][sync] :: from ' + userID + ' at ' + curTime);
     },
 
     reqVideo : (roomID, client) => {
-        console.log('>[WS][reqVideo] :: sending resVideo event to client');
+        socketLog('>[WS][reqVideo] :: sending resVideo event to client');
         RoomModelFactory.getRoom(roomID).then((room) => {
             let youtubeID = room.getCurrentVideo();
             client.emit('resVideo', youtubeID);
@@ -79,12 +89,12 @@ module.exports = {
 
     //@TODO
     loadVideo : () => {
-        console.log('>[WS][loadVideo] :: ');
+        socketLog('>[WS][loadVideo] :: ');
     },
 
     //@TODO
     changeSpeed : () => {
-        console.log('>[WS][changeSpeed]');
+        socketLog('>[WS][changeSpeed]');
     },
 
 
@@ -92,7 +102,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                console.log('>[WS][playVideo] :: in roomID:' + roomID);
+                socketLog('>[WS][playVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('playVideo');
             }
         })
@@ -106,7 +116,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                console.log('>[WS][pauseVideo] :: in roomID:' + roomID);
+                socketLog('>[WS][pauseVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('pauseVideo');
             }
         })
@@ -120,7 +130,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                console.log('>[WS][pauseVideo] :: from roomID: ' + roomID);
+                socketLog('>[WS][pauseVideo] :: from roomID: ' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('seekVideo', time);
             }
         })
@@ -130,7 +140,7 @@ module.exports = {
     },
 
     doneVideo : (roomID, userID, socket) => {
-        console.log('>[WS][doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
+        socketLog('>[WS][doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
@@ -138,7 +148,7 @@ module.exports = {
                 .then((room) => {
                     room.dequeueVideo();
                     let nextVideo = room.getCurrentVideo();
-                    console.log('>[WS][loadVideo] emmit.');
+                    socketLog('>[WS][loadVideo] emmit.');
                     socket.to(getRoomName(roomID)).emit('loadVideo', nextVideo);
                     //client.broadcast.emit('loadVideo', nextVideo);
 
@@ -168,7 +178,7 @@ module.exports = {
     },
 
     chatMessage: (roomID, userID, socket, message) => {
-        console.log("[chatMessage] received in room " + roomID + " from user " + userID + " (" + message +")");
+        socketLog("[chatMessage] received in room " + roomID + " from user " + userID + " (" + message +")");
         socket.to(getRoomName(roomID)).emit('chatMessage', userID, message);
     }
 

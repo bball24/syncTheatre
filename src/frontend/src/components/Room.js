@@ -14,7 +14,13 @@ export default class Room extends React.Component {
 
     constructor(props){
         super(props);
-        const roomID = this.props.match.params.roomID;
+        let roomID;
+        if(!this.props.roomID){
+            roomID = this.props.match.params.roomID;
+        }
+        else{
+            roomID = this.props.roomID;
+        }
         let userID = this.props.userID;
 
         //debug
@@ -91,7 +97,7 @@ export default class Room extends React.Component {
             height: '390',
             width: '640',
             playerVars: { // https://developers.google.com/youtube/player_parameters
-                autoplay: 1
+                autoplay: 1,
             }
         };
 

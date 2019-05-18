@@ -92,20 +92,18 @@ router.post('/addVideo', (req, res) => {
 	let videoURL = req.body.videoURL;
 
 	//step 2: Instantiate video model
-    let videos = []
-    videoURL.forEach((url) => {
-        videos.push(new VideoModel(url, userID));
-    })
+    let vid = new VideoModel(videoURL, userID);
 
-	//refactor using factory
 	RoomModelFactory.getRoom(roomID).then((room) => {
-        videos.forEach((video) => {
-            let videoID = video.getVideoID();
-            room.enqueueVideo(videoID);
-        })
+        return room.enqueueVideo(vid.getVideoID());
+    })
+    .then((room) => {
         return RoomModelFactory.updateRoom(roomID, room.toJson());
     })
     .then((room) => {
+        let getSocket = require('../sockets').getSocket;
+        const socket = getSocket();
+        socket.to(room.syncRoom).emit('updateQueue');
         res.status(200).json(room.toJson());
     })
     .catch((err) => {
@@ -135,7 +133,6 @@ router.get('/users/:id', (req, res) => {
         return room.getUserList();
     })
     .then((userList) => {
-        console.log(userList);
         res.status(200).json({ users: userList})
     })
     .catch((err) => {
