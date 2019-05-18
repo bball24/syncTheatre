@@ -6,6 +6,8 @@ import React from 'react';
 import "./VideoQueue.scss";
 import SendChatMessage from './SendChatMessage';
 import RoomUsers from "./RoomUsers";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 
 export default class ChatBox extends React.Component {
     constructor(props){
@@ -80,24 +82,38 @@ export default class ChatBox extends React.Component {
      */
     render(){
         return[
-            <RoomUsers
-                key="userList"
-                ref={this._userList}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-                apiHost={this.state.apiHost}
-            />,
-            <div key="chatWrap" className="chatBox">
-                <ul>
-                    {this.renderMessages()}
-                </ul>
-            </div>,
-            <SendChatMessage
-                key="sendMsg"
-                socket={this.state.socket}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-            />
+
+            <Tabs>
+                <TabList>
+                    <Tab>Users</Tab>
+                    <Tab>Chat</Tab>
+                </TabList>
+
+                <TabPanel>
+                    <RoomUsers
+                        key="userList"
+                        ref={this._userList}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        apiHost={this.state.apiHost}
+                    />
+                </TabPanel>
+
+                <TabPanel>
+                    <div key="chatWrap" className="chatBox">
+                        <ul>
+                            {this.renderMessages()}
+                        </ul>
+                    </div>
+                    <SendChatMessage
+                        key="sendMsg"
+                        socket={this.state.socket}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                    />
+                </TabPanel>
+            </Tabs>
+
         ]
     }
 }

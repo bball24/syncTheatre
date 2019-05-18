@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-
+import "./SendChatMessage.scss"
 export default class SendChatMessage extends React.Component {
     constructor(props){
         super(props);
@@ -51,9 +51,8 @@ export default class SendChatMessage extends React.Component {
             <form onSubmit={this.handleSubmit}>
                 <label>
                     Send Message:
-                    <input type="text" value={this.state.message} onChange={this.handleChange}/>
+                    <input type="text" value={this.state.message} onChange={this.handleChange} placeholder="Type Here"/>
                 </label>
-                <input type="submit" value="Send" />
             </form>
         )
     }
