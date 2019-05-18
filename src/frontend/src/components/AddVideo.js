@@ -4,6 +4,7 @@
 
 import React from 'react';
 import axios from 'axios';
+import "./AddVideo.scss"
 
 export default class AddVideo extends React.Component {
     constructor(props){
@@ -47,7 +48,7 @@ export default class AddVideo extends React.Component {
         return(
             <form onSubmit={this.handleSubmit}>
                 <label>
-                Add Video:
+                Add Video
                     <input type="text" value={this.state.youtubeURL} onChange={this.handleChange}/>
                 </label>
                 <input type="submit" value="Add" />

@@ -117,6 +117,7 @@ export default class Room extends React.Component {
                     />
                 </div>
                 <ChatBox
+                    className="ChatBox"
                     key="chat"
                     ref={this._chatBox}
                     apiHost = {this.state.apiHost}

@@ -48,7 +48,6 @@ class App extends Component {
                         <Navbar.Collapse>
                             <Nav pullRight>
                                 <NavItem href="/signup">Signup</NavItem>
-                                <NavItem href="/login">Login</NavItem>
                                 <NavItem href='/room'> Room </NavItem>
                             </Nav>
                         </Navbar.Collapse>
