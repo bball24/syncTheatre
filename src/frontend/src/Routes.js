@@ -5,6 +5,7 @@ import Room from "./components/Room"
 import Signup from './components/Signup'
 import CreateRoom from './components/CreateRoom';
 import PersistentRoom from "./components/PersistentRoom";
+import UserToken from "./components/UserToken";
 
 export default class Routes extends React.Component {
     constructor(props){
@@ -19,6 +20,7 @@ export default class Routes extends React.Component {
         return (<Switch>
             <Route path="/" exact component={Home} />
             <Route path='/signup' exact component={Signup}/>
+            <Route path="/token/" exact component={UserToken}/>
             <Route
                 exact
                 path="/user/:roomName"

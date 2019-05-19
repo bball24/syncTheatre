@@ -20,7 +20,7 @@ export default class Room extends React.Component {
         // init room and userIDs. if roomID was passed in,
         // it's a permanent room and the roomID will not be
         // in the url params. Otherwise it will be and its a temp room.
-        if(!this.props.roomID){ roomID = this.props.match.params.roomID;}
+        if(!this.props.roomID){ roomID = this.props.match.params.roomID; }
         else{ roomID = this.props.roomID; }
         let userID = this.props.userID;
 
