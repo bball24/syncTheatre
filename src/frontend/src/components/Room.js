@@ -6,6 +6,7 @@ import AddVideo from './AddVideo';
 import VideoQueue from './VideoQueue';
 import ChatBox from './ChatBox';
 import "./Room.scss"
+import "./Home.scss"
 import axios from "axios"
 
 // https://youtu.be/dQw4w9WgXcQ
@@ -128,19 +129,20 @@ export default class Room extends React.Component {
                     founderID={this.state.founderID}
                 />
             </div>,
+            <AddVideo
+                key="form"
+                socket={this.state.socket}
+                userID={this.state.userID}
+                roomID={this.state.roomID}
+                apiHost={this.state.apiHost}/>,
             <VideoQueue
+                className="VideoQueue"
                 key="queue"
                 ref={this._videoQueueComponent}
                 userID={this.state.userID}
                 roomID={this.state.roomID}
                 apiHost={this.state.apiHost}
             />,
-            <AddVideo
-                key="form"
-                socket={this.state.socket}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-                apiHost={this.state.apiHost}/>
         ];
     }
 }

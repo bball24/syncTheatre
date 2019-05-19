@@ -38,7 +38,7 @@ class App extends Component {
         }
         else{
             return (
-                <div className="App container">
+                <div className="Appcontainer">
                     <Navbar fluid collapseOnSelect>
                         <Navbar.Header>
                             <Navbar.Brand>
