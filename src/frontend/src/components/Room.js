@@ -59,14 +59,14 @@ export default class Room extends React.Component {
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
-        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent)});
+        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent, this)});
         socket.on('error', (err) => {lib.onError(err)});
         socket.on('changeSpeed', (speed) => {lib.changeSpeed(speed)});
         socket.on('playVideo', () => {lib.playVideo()});
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
         socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
-        socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox)});
+        socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox, this)});
         socket.on('chatMessage', (name, id, msg) => {lib.chatMessage(name, id, msg, this._chatBox)});
         socket.on('updateUsers', () => {lib.updateUsers(this._chatBox)});
 
@@ -90,15 +90,31 @@ export default class Room extends React.Component {
         event.target.pauseVideo();
         this.state.lib.setPlayer(event.target);
         this.state.lib.onPlayerReady(event);
+        this.state.lib.seekVideo(this.state.curTime)
+        this.state.lib.playVideo();
+        console.log("it fired");
     }
 
     render() {
+        // Options found here
+        // https://developers.google.com/youtube/player_parameters
+        let playerVars = {
+            autoplay: 1,
+            controls : 0,
+            disablekb : 1,
+            fs : 0,
+            modestbranding: 1,
+        }
+
+        //user is party leader
+        if(this.state.partyLeaderID === this.state.userID){
+            playerVars.controls = 1;
+            playerVars.disablekb = 0;
+        }
         const opts = {
             height: '390',
             width: '640',
-            playerVars: { // https://developers.google.com/youtube/player_parameters
-                autoplay: 1,
-            }
+            playerVars: playerVars
         };
 
         return [

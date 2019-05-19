@@ -58,7 +58,11 @@ export default class SyncLib {
 
     }
 
-    resLeader(partyLeaderID, chatBox){
+    resLeader(partyLeaderID, chatBox, room){
+        room.setState({
+            curTime : this.player.getCurrentTime(),
+            partyLeaderID : partyLeaderID
+        });
         this.socketLog("[resLeader] received. Party leader is: " + partyLeaderID);
         chatBox.current.updateCurrentLeader(partyLeaderID);
     }
@@ -78,7 +82,10 @@ export default class SyncLib {
         this.player.seekTo(time);
     }
 
-    loadVideo(video, queue){
+    loadVideo(video, queue, room){
+        room.setState({
+            videoID : video.videoID
+        });
         this.socketLog('[loadVideo] loading video:' + video);
         queue.current.updateQueue();
         if(video && video.videoID !== ""){
@@ -88,7 +95,6 @@ export default class SyncLib {
         else{
             this.player.loadVideoById('otHnRgZUs2I', 0, "default");
         }
-
     }
 
     updateQueue(component){
@@ -133,7 +139,10 @@ export default class SyncLib {
 
     updateUsers(chatBox){
         this.socketLog("[updateUsers] received")
-        chatBox.current.updateUserList();
+        if(chatBox.current){
+            chatBox.current.updateUserList();
+        }
+
     }
 
 
