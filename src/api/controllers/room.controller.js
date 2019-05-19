@@ -141,4 +141,26 @@ router.get('/users/:id', (req, res) => {
     })
 })
 
+/**
+ * Returns the userIDs of the founding member
+ * and active party leader
+ *
+ * {
+ *   partyLeaderID : <userID>,
+ *   founderID : <userID>
+ * }
+ */
+router.get('/leadership/:id', (req, res) => {
+    const roomID = req.params.id;
+    RoomModelFactory.getRoom(roomID).then((room) => {
+        res.status(200).json({
+            partyLeaderID : room.partyLeaderID,
+            founderID : room.founderID
+        });
+    })
+    .catch((err) => {
+        res.status(400).json(err);
+    })
+})
+
 module.exports = router;

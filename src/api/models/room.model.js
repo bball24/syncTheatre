@@ -206,7 +206,23 @@ class Room {
             Promise.all(promises).then((users) => {
                 let returnUsers = []
                 users.forEach((user) => {
-                    returnUsers.push({userID: user.userID, userName: user.userName});
+
+                    let isPartyLeader = false;
+                    let isFounder = false;
+
+                    if(user.userID === this.partyLeaderID){
+                        isPartyLeader = true;
+                    }
+                    if(user.userID === this.founderID){
+                        isFounder = true;
+                    }
+
+                    returnUsers.push({
+                        userID: user.userID,
+                        userName: user.userName,
+                        isPartyLeader : isPartyLeader,
+                        isFounder : isFounder
+                    });
                 });
                 resolve(returnUsers);
             })

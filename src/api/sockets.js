@@ -38,6 +38,7 @@ module.exports = {
             client.on('doneVideo', (roomID, userID) => {syncLib.doneVideo(roomID, userID, socket)});
             client.on('updateQueue', (roomID, userID) => {syncLib.updateQueue(roomID, userID, socket)});
             client.on('sendMessage', (roomID, userID, message) => {syncLib.chatMessage(roomID, userID, socket, message)});
+            client.on('leaderChange', (roomID, userID, newLeaderID) => {syncLib.leaderChange(roomID, userID, newLeaderID, socket)});
 
             _client = client;
         });

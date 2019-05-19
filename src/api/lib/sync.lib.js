@@ -4,7 +4,7 @@
 const RoomModelFactory = require('../models/room.model').RoomModelFactory;
 const UserModel = require('../models/user.model');
 
-const DEBUG_OUTPUT = false;
+const DEBUG_OUTPUT = true;
 const socketLog = (output) => {
     if(DEBUG_OUTPUT){
         console.log("--->[WS] :: " + output);
@@ -189,6 +189,19 @@ module.exports = {
             console.error(err);
         })
 
+    },
+
+    leaderChange : (roomID, userID, newLeaderID, socket) => {
+        socketLog("UserID: " + userID + " changed party leader in roomID:" + roomID + " to new user: " + newLeaderID);
+        isPartyLeader(roomID, userID)
+        .then((isLeader) => {
+            if (isLeader) {
+                socket.to(getRoomName(roomID)).emit('updateUsers');
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     }
 
 

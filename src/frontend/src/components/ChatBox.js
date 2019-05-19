@@ -9,7 +9,11 @@ import RoomUsers from "./RoomUsers";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 import axios from 'axios';
+import { FaCrown } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+import { FaArrowUp } from "react-icons/fa";
 import "./ChatBox.scss"
+import { Button } from 'react-bootstrap'
 
 export default class ChatBox extends React.Component {
     constructor(props){
@@ -20,7 +24,9 @@ export default class ChatBox extends React.Component {
             userID : props.userID,
             roomID : props.roomID,
             socket  : props.socket,
-            apiHost : props.apiHost
+            apiHost : props.apiHost,
+            partyLeaderID : props.partyLeaderID,
+            founderID : props.founderID
         };
 
         this.state._userList = React.createRef();
@@ -30,6 +36,7 @@ export default class ChatBox extends React.Component {
         this.renderMessages = this.renderMessages.bind(this);
         this.renderUsers = this.renderUsers.bind(this);
         this.updateUserList = this.updateUserList.bind(this);
+        this.changePartyLeaderTo = this.changePartyLeaderTo.bind(this);
         this.renderMessages();
         this.updateUserList()
     }
@@ -81,9 +88,45 @@ export default class ChatBox extends React.Component {
         this.scrollToBottom();
     }
 
+    changePartyLeaderTo(userID){
+        console.log("Chaning PL to " + userID);
+        axios.put(this.state.apiHost + '/api/rooms/' + this.state.roomID , { partyLeaderID: userID} )
+        .then((room) => {
+            this.state.socket.emit('leaderChange', this.state.roomID, this.state.userID, userID );
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    }
+
     renderUsers(){
-        if(this.state.users){
-            return this.state.users.map((user, i) =><li key={i}><span>{user.userName}</span></li>);
+        let curUserIsLeader = this.state.partyLeaderID === this.state.userID;
+        if(this.state.users && this.state.partyLeaderID !== -1) {
+            console.log(this.state.users);
+            return this.state.users.map((user, i) => {
+                if(user.isPartyLeader){
+                    return (
+                        <div className="userLine" key={i}>
+                            <span className="crownIcon"><FaCrown/> {user.userName}</span>
+                        </div>
+                    )
+                }
+                else{
+                    return (
+                        <div className="userLine" key={i}>
+                            <span className="userIcon"><FaUser/> {user.userName}</span>
+                            {curUserIsLeader &&
+                            <Button onClick={() => {
+                                this.changePartyLeaderTo(user.userID)
+                            }} className="changePLButton" variant="outline-secondary" size="sm">
+                                <FaArrowUp className="buttonUp"/> Make Leader
+                            </Button>
+                            }
+                        </div>
+                    )
+                }
+
+            })
         }
         else{
             return <li>Loading..</li>
@@ -132,9 +175,9 @@ export default class ChatBox extends React.Component {
 
                 <TabPanel>
                     <div className="UserList">
-                        <ul>
+                        <div>
                             {this.renderUsers()}
-                        </ul>
+                        </div>
                     </div>
                 </TabPanel>
 

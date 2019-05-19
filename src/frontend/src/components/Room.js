@@ -49,6 +49,7 @@ export default class Room extends React.Component {
         lib.startSync = lib.startSync.bind(lib);
         lib.setPlayer = lib.setPlayer.bind(lib);
         this.videoReady = this.videoReady.bind(this);
+        this.updateLeaders = this.updateLeaders.bind(this);
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
@@ -67,6 +68,7 @@ export default class Room extends React.Component {
             this._chatBox.current.addMessage(userName, userID, message);
         });
         socket.on('updateUsers', () => {
+            console.log("update user list GOT")
             this._chatBox.current.updateUserList();
         });
 
@@ -78,11 +80,27 @@ export default class Room extends React.Component {
             socket : socket,
             lib : lib,
             player : null,
-            apiHost : this.props.apiHost
+            apiHost : this.props.apiHost,
+            partyLeaderID: -1,
+            founderID: -1
         };
 
         this._videoQueueComponent = React.createRef();
         this._chatBox = React.createRef();
+        this.updateLeaders();
+    }
+
+    updateLeaders(){
+        axios.get(this.state.apiHost + '/api/rooms/leadership/' + this.state.roomID)
+        .then((leaders) => {
+            this.setState({
+                partyLeaderID : leaders.data.partyLeaderID,
+                founderID : leaders.data.founderID
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     }
 
     videoReady(event) {
@@ -124,6 +142,8 @@ export default class Room extends React.Component {
                     userID={this.state.userID}
                     roomID={this.state.roomID}
                     socket={this.state.socket}
+                    partyLeaderID={this.state.partyLeaderID}
+                    founderID={this.state.founderID}
                 />
             </div>,
             <VideoQueue
