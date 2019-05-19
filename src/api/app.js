@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var passport = require("passport"); // at header
 
 var apiRouter = require('./routes/api.router');
 
@@ -17,6 +18,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// init passport for authentication
+app.use(passport.initialize()); // after line no.20 (express.static)
+require("./config/passport.setup");
 
 //allow x-origin form :3000
 // Add headers

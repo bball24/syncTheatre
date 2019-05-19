@@ -1,7 +1,6 @@
 // Created by Dan
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20');
-const passportSetup = require('./config/passport-setup');
 
 passport.use(
     new GoogleStrategy({
@@ -13,3 +12,4 @@ passport.use(
         // passport callback function
     })
 );
+
