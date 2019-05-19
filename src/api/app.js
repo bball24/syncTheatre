@@ -41,6 +41,8 @@ app.use(function (req, res, next) {
 });
 
 // Routers
+let authControllers = require('./controllers/auth.controller');
+app.use('/auth', authControllers);
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
