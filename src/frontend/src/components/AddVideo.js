@@ -46,7 +46,7 @@ export default class AddVideo extends React.Component {
 
     render(){
         return(
-            <form onSubmit={this.handleSubmit}>
+            <form className='addVideo' onSubmit={this.handleSubmit}>
                 <label>
                 Add Video
                     <input type="text" value={this.state.youtubeURL} onChange={this.handleChange}/>
