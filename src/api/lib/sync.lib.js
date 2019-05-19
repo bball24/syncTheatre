@@ -37,14 +37,14 @@ module.exports = {
 
     // Request Event Handlers
     connected : () => {
-        socketLog('>[WS] :: New client connected.');
+        socketLog('[connected] New client connected.');
     },
 
     join: (roomID, userID, client, socket) => {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
         client.userID = userID;
-        socketLog(">[WS][join] Room " + roomName);
+        socketLog("[join] Room " + roomName);
         RoomModelFactory.getRoom(roomID).then((room) => {
             room.joinUser(userID);
             return RoomModelFactory.updateRoom(roomID, room.toJson());
@@ -58,7 +58,7 @@ module.exports = {
     },
 
     customDisconnect : (userID, roomID, socket) => {
-        socketLog('>[WS][customDC] :: user ' + userID + ' disconnected from room ' + roomID);
+        socketLog('[customDC] :: user ' + userID + ' disconnected from room ' + roomID);
         RoomModelFactory.getRoom(roomID).then((room) => {
             room.disconnectUser(userID);
             return RoomModelFactory.updateRoom(roomID, room.toJson());
@@ -76,10 +76,12 @@ module.exports = {
     },
 
     reqVideo : (roomID, client) => {
-        socketLog('>[WS][reqVideo] :: sending resVideo event to client');
+        socketLog('[reqVideo] :: sending resVideo event to client');
         RoomModelFactory.getRoom(roomID).then((room) => {
             let youtubeID = room.getCurrentVideo();
+            let partyLeaderID = room.partyLeaderID;
             client.emit('resVideo', youtubeID);
+            client.emit('resLeader', partyLeaderID);
         })
         .catch((err) => {
             console.error(err);
@@ -89,12 +91,12 @@ module.exports = {
 
     //@TODO
     loadVideo : () => {
-        socketLog('>[WS][loadVideo] :: ');
+        socketLog('[loadVideo] :: ');
     },
 
     //@TODO
     changeSpeed : () => {
-        socketLog('>[WS][changeSpeed]');
+        socketLog('[changeSpeed]');
     },
 
 
@@ -102,7 +104,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                socketLog('>[WS][playVideo] :: in roomID:' + roomID);
+                socketLog('[playVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('playVideo');
             }
         })
@@ -116,7 +118,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                socketLog('>[WS][pauseVideo] :: in roomID:' + roomID);
+                socketLog('[pauseVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('pauseVideo');
             }
         })
@@ -130,7 +132,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                socketLog('>[WS][pauseVideo] :: from roomID: ' + roomID);
+                socketLog('[pauseVideo] :: from roomID: ' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('seekVideo', time);
             }
         })
@@ -140,7 +142,7 @@ module.exports = {
     },
 
     doneVideo : (roomID, userID, socket) => {
-        socketLog('>[WS][doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
+        socketLog('[doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
@@ -148,7 +150,7 @@ module.exports = {
                 .then((room) => {
                     room.dequeueVideo();
                     let nextVideo = room.getCurrentVideo();
-                    socketLog('>[WS][loadVideo] emmit.');
+                    socketLog('[loadVideo] emmit.');
                     socket.to(getRoomName(roomID)).emit('loadVideo', nextVideo);
                     //client.broadcast.emit('loadVideo', nextVideo);
 
@@ -192,17 +194,28 @@ module.exports = {
     },
 
     leaderChange : (roomID, userID, newLeaderID, socket) => {
-        socketLog("UserID: " + userID + " changed party leader in roomID:" + roomID + " to new user: " + newLeaderID);
+        socketLog("[leaderChange] UserID: " + userID +
+                  " changed party leader in roomID:" + roomID +
+                  " to new user: " + newLeaderID);
+
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if (isLeader) {
-                socket.to(getRoomName(roomID)).emit('updateUsers');
+                return RoomModelFactory.updateRoom(roomID, { partyLeaderID : newLeaderID })
             }
+            else{
+                throw({ error : "User" + userID + "is not leader in Room " + roomID})
+            }
+        })
+        .then((room) => {
+            socket.to(getRoomName(roomID)).emit('resLeader', newLeaderID);
+            socket.to(getRoomName(roomID)).emit('updateUsers');
+            socketLog("Emitting [resLeader]")
         })
         .catch((err) => {
             console.error(err);
         })
-    }
+    },
 
 
 }

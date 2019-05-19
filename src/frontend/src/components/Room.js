@@ -15,13 +15,17 @@ export default class Room extends React.Component {
     constructor(props){
         super(props);
         let roomID;
-        if(!this.props.roomID){
-            roomID = this.props.match.params.roomID;
-        }
-        else{
-            roomID = this.props.roomID;
-        }
+
+        // init room and userIDs. if roomID was passed in,
+        // it's a permanent room and the roomID will not be
+        // in the url params. Otherwise it will be and its a temp room.
+        if(!this.props.roomID){ roomID = this.props.match.params.roomID;}
+        else{ roomID = this.props.roomID; }
         let userID = this.props.userID;
+
+        //component references
+        this._videoQueueComponent = React.createRef();
+        this._chatBox = React.createRef();
 
         //debug
         console.log({Page: 'Room', roomID: roomID, userID: userID});
@@ -48,31 +52,25 @@ export default class Room extends React.Component {
         lib.syncTick = lib.syncTick.bind(lib);
         lib.startSync = lib.startSync.bind(lib);
         lib.setPlayer = lib.setPlayer.bind(lib);
+        lib.resLeader = lib.resLeader.bind(lib);
+        lib.chatMessage = lib.chatMessage.bind(lib);
+        lib.updateUsers = lib.updateUsers.bind(lib);
         this.videoReady = this.videoReady.bind(this);
-        this.updateLeaders = this.updateLeaders.bind(this);
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
-        socket.on('loadVideo', (videoID) => {
-            this._videoQueueComponent.current.updateQueue();
-            lib.loadVideo(videoID)
-        });
+        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent)});
         socket.on('error', (err) => {lib.onError(err)});
         socket.on('changeSpeed', (speed) => {lib.changeSpeed(speed)});
         socket.on('playVideo', () => {lib.playVideo()});
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
         socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
-        socket.on('chatMessage', (userName, userID, message) => {
-            console.log("[H] :: Msg recieved: " + message)
-            this._chatBox.current.addMessage(userName, userID, message);
-        });
-        socket.on('updateUsers', () => {
-            console.log("update user list GOT")
-            this._chatBox.current.updateUserList();
-        });
+        socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox)});
+        socket.on('chatMessage', (name, id, msg) => {lib.chatMessage(name, id, msg, this._chatBox)});
+        socket.on('updateUsers', () => {lib.updateUsers(this._chatBox)});
 
-
+        //init room state
         this.state = {
             roomID : roomID,
             userID : userID,
@@ -85,22 +83,6 @@ export default class Room extends React.Component {
             founderID: -1
         };
 
-        this._videoQueueComponent = React.createRef();
-        this._chatBox = React.createRef();
-        this.updateLeaders();
-    }
-
-    updateLeaders(){
-        axios.get(this.state.apiHost + '/api/rooms/leadership/' + this.state.roomID)
-        .then((leaders) => {
-            this.setState({
-                partyLeaderID : leaders.data.partyLeaderID,
-                founderID : leaders.data.founderID
-            });
-        })
-        .catch((err) => {
-            console.error(err);
-        })
     }
 
     videoReady(event) {

@@ -49,7 +49,6 @@ export default class ChatBox extends React.Component {
      * @param text - the text of the message sent by the user
      */
     addMessage(userName, userID, text){
-        console.log("adding msg");
         const msg = {
             userName: userName,
             userID : userID,
@@ -67,7 +66,6 @@ export default class ChatBox extends React.Component {
                 users : users.data.users
             });
 
-            console.log(this.state.users);
         })
         .catch((err) => {
             console.error(err);
@@ -88,37 +86,43 @@ export default class ChatBox extends React.Component {
         this.scrollToBottom();
     }
 
-    changePartyLeaderTo(userID){
-        console.log("Chaning PL to " + userID);
-        axios.put(this.state.apiHost + '/api/rooms/' + this.state.roomID , { partyLeaderID: userID} )
-        .then((room) => {
-            this.state.socket.emit('leaderChange', this.state.roomID, this.state.userID, userID );
-        })
-        .catch((err) => {
-            console.error(err);
-        })
+    changePartyLeaderTo(newLeaderID){
+        this.state.socket.emit('leaderChange', this.state.roomID, this.state.userID, newLeaderID );
+    }
+
+    updateCurrentLeader(newLeaderID){
+        console.log("chatbox updating leader with ID" + newLeaderID);
+        this.setState({ partyLeaderID : newLeaderID });
     }
 
     renderUsers(){
         let curUserIsLeader = this.state.partyLeaderID === this.state.userID;
         if(this.state.users && this.state.partyLeaderID !== -1) {
-            console.log(this.state.users);
             return this.state.users.map((user, i) => {
                 if(user.isPartyLeader){
                     return (
                         <div className="userLine" key={i}>
-                            <span className="crownIcon"><FaCrown/> {user.userName}</span>
+                            <span className="crownIcon">
+                                <FaCrown/>
+                                <span className="userText">{user.userName}</span>
+                                {user.userID == this.state.userID && <span> (you)</span>}
+                            </span>
                         </div>
                     )
                 }
                 else{
                     return (
                         <div className="userLine" key={i}>
-                            <span className="userIcon"><FaUser/> {user.userName}</span>
+                            <span className="userIcon">
+                                <FaUser/>
+                                <span className="userText">{user.userName}</span>
+                                {user.userID == this.state.userID && <span> (you)</span>}
+                            </span>
                             {curUserIsLeader &&
-                            <Button onClick={() => {
-                                this.changePartyLeaderTo(user.userID)
-                            }} className="changePLButton" variant="outline-secondary" size="sm">
+                            <Button onClick={() => {this.changePartyLeaderTo(user.userID)}}
+                                className="changePLButton"
+                                variant="outline-secondary"
+                                size="sm">
                                 <FaArrowUp className="buttonUp"/> Make Leader
                             </Button>
                             }

@@ -2,12 +2,21 @@
  * Created by brett on 5/3/19.
  */
 
+const DEBUG_OUTPUT = true;
+
 export default class SyncLib {
     constructor(roomID, userID, socket){
         this.roomID = roomID;
         this.userID = userID;
         this.player = null;
         this.socket = socket;
+    }
+
+    socketLog(output){
+        if(DEBUG_OUTPUT){
+            const prefix = "[WS] :: ";
+            console.log('%c'+prefix + output, 'color:dodgerblue;');
+        }
     }
 
     setPlayer(player){
@@ -23,7 +32,7 @@ export default class SyncLib {
     };
 
     connect(){
-        console.log('Connected');
+        this.socketLog('[Connected]');
         this.socket.emit('join', this.roomID, this.userID);
         //this.startSync();
     }
@@ -33,11 +42,11 @@ export default class SyncLib {
     }
 
     changeSpeed(speed){
-        console.log('[h][changeSpeed] change speed received speed: ' + speed);
+        this.socketLog('[changeSpeed] change speed received speed: ' + speed);
     }
 
     resVideo(event, video){
-        console.log('[h][resVideo] youtubeID: ' + video + ' is being played in the room.');
+        this.socketLog('[resVideo] youtubeID: ' + video + ' is being played in the room.');
 
         if(video && video.videoID !== ""){
             event.target.loadVideoById(video.videoID, 0, "default");
@@ -49,25 +58,31 @@ export default class SyncLib {
 
     }
 
+    resLeader(partyLeaderID, chatBox){
+        this.socketLog("[resLeader] received. Party leader is: " + partyLeaderID);
+        chatBox.current.updateCurrentLeader(partyLeaderID);
+    }
+
     playVideo(){
-        console.log('[h][playVideo] play received');
+        this.socketLog('[playVideo] play received');
         this.player.playVideo();
     }
 
     pauseVideo(){
-        console.log('[h][pauseVideo] pause received');
+        this.socketLog('[pauseVideo] pause received');
         this.player.pauseVideo();
     }
 
     seekVideo(time){
-        console.log('[h][seekVideo] seek received time: ' + time);
+        this.socketLog('[seekVideo] seek received time: ' + time);
         this.player.seekTo(time);
     }
 
-    loadVideo(video){
-        console.log('loading video:' + video)
+    loadVideo(video, queue){
+        this.socketLog('[loadVideo] loading video:' + video);
+        queue.current.updateQueue();
         if(video && video.videoID !== ""){
-            console.log(video);
+            this.socketLog(video);
             this.player.loadVideoById(video.videoID, 0, "default");
         }
         else{
@@ -77,7 +92,7 @@ export default class SyncLib {
     }
 
     updateQueue(component){
-        console.log('updating room queue');
+        this.socketLog('[updateQueue] updating room queue');
         component.current.updateQueue();
     }
 
@@ -110,4 +125,16 @@ export default class SyncLib {
     onEnd(){
         this.socket.emit('doneVideo', this.roomID, this.userID);
     }
+
+    chatMessage(userName, userID, message, chatBox){
+        this.socketLog("[chatMessage] received: " + message);
+        chatBox.current.addMessage(userName, userID, message);
+    }
+
+    updateUsers(chatBox){
+        this.socketLog("[updateUsers] received")
+        chatBox.current.updateUserList();
+    }
+
+
 }
