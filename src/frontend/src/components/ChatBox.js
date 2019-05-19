@@ -8,24 +8,30 @@ import SendChatMessage from './SendChatMessage';
 import RoomUsers from "./RoomUsers";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
+import axios from 'axios';
+import "./ChatBox.scss"
 
 export default class ChatBox extends React.Component {
     constructor(props){
         super(props);
         this.state = {
             messages : [],
+            users : [],
             userID : props.userID,
             roomID : props.roomID,
             socket  : props.socket,
             apiHost : props.apiHost
         };
 
-        this._userList = React.createRef();
+        this.state._userList = React.createRef();
 
         //bindings
         this.addMessage = this.addMessage.bind(this);
         this.renderMessages = this.renderMessages.bind(this);
+        this.renderUsers = this.renderUsers.bind(this);
+        this.updateUserList = this.updateUserList.bind(this);
         this.renderMessages();
+        this.updateUserList()
     }
 
     /**
@@ -35,10 +41,11 @@ export default class ChatBox extends React.Component {
      * @param user - the userID of the user who sent the message
      * @param text - the text of the message sent by the user
      */
-    addMessage(user, text){
+    addMessage(userName, userID, text){
         console.log("adding msg");
         const msg = {
-            user : user,
+            userName: userName,
+            userID : userID,
             text : text
         };
         this.setState({
@@ -47,7 +54,40 @@ export default class ChatBox extends React.Component {
     }
 
     updateUserList(){
-        this._userList.current.updateUsers();
+        const url = this.state.apiHost + '/api/rooms/users/' + this.state.roomID;
+        axios.get(url).then((users) => {
+            this.setState({
+                users : users.data.users
+            });
+
+            console.log(this.state.users);
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    }
+
+    scrollToBottom = () => {
+        if(this.messagesEnd) {
+            this.messagesEnd.scrollIntoView({behavior: "smooth"});
+        }
+    }
+
+    componentDidMount() {
+        this.scrollToBottom();
+    }
+
+    componentDidUpdate() {
+        this.scrollToBottom();
+    }
+
+    renderUsers(){
+        if(this.state.users){
+            return this.state.users.map((user, i) =><li key={i}><span>{user.userName}</span></li>);
+        }
+        else{
+            return <li>Loading..</li>
+        }
     }
 
     /**
@@ -55,12 +95,13 @@ export default class ChatBox extends React.Component {
      * element of the messages array.
      */
     renderMessages(){
-        console.log(this.state.messages);
         if(this.state.messages){
+            //@TODO use msg.userID to build an <a href=/user/profile/msg.userID>msg.userName</a> link
+            // for the chatUser span
             return this.state.messages.map((msg, i) => {
                 return(
                     <div class="chatMessage" key={i}>
-                        <span class="chatUser">{msg.user}</span>
+                        <span class="chatUser">{msg.userName}: </span>
                         <span class="chatText">{msg.text}</span>
                     </div>
                 );
@@ -90,20 +131,21 @@ export default class ChatBox extends React.Component {
                 </TabList>
 
                 <TabPanel>
-                    <RoomUsers
-                        key="userList"
-                        ref={this._userList}
-                        userID={this.state.userID}
-                        roomID={this.state.roomID}
-                        apiHost={this.state.apiHost}
-                    />
+                    <div className="UserList">
+                        <ul>
+                            {this.renderUsers()}
+                        </ul>
+                    </div>
                 </TabPanel>
 
                 <TabPanel>
                     <div key="chatWrap" className="chatBox">
-                        <ul>
+                        <div className="chatList">
                             {this.renderMessages()}
-                        </ul>
+                            <div style={{ float:"left", clear: "both" }}
+                                 ref={(el) => { this.messagesEnd = el; }}>
+                            </div>
+                        </div>
                     </div>
                     <SendChatMessage
                         key="sendMsg"

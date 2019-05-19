@@ -9,28 +9,13 @@ export default class RoomUsers extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            users : [],
-            userID : props.userID,
-            roomID : props.roomID,
-            apiHost : props.apiHost
+            users : this.props.users,
+            userID : this.props.userID,
+            roomID : this.props.roomID,
         };
 
         //bindings
-        this.updateUsers = this.updateUsers.bind(this);
         this.renderUsers = this.renderUsers.bind(this);
-        this.updateUsers();
-    }
-
-    updateUsers(){
-        const url = this.state.apiHost + '/api/rooms/users/' + this.state.roomID;
-        axios.get(url).then((users) => {
-            this.setState({
-                users : users.data.users
-            });
-        })
-        .catch((err) => {
-            console.error(err);
-        })
     }
 
     renderUsers(){

@@ -36,10 +36,11 @@ export default class SyncLib {
         console.log('[h][changeSpeed] change speed received speed: ' + speed);
     }
 
-    resVideo(event, youtubeID){
-        console.log('[h][resVideo] youtubeID: ' + youtubeID + ' is being played in the room.');
-        if(youtubeID !== ""){
-            event.target.loadVideoById(youtubeID, 0, "default");
+    resVideo(event, video){
+        console.log('[h][resVideo] youtubeID: ' + video + ' is being played in the room.');
+
+        if(video && video.videoID !== ""){
+            event.target.loadVideoById(video.videoID, 0, "default");
         }
         else{
             event.target.loadVideoById('otHnRgZUs2I', 0, "default")
@@ -65,7 +66,14 @@ export default class SyncLib {
 
     loadVideo(video){
         console.log('loading video:' + video)
-        this.player.loadVideoById(video.videoID, 0, "default");
+        if(video && video.videoID !== ""){
+            console.log(video);
+            this.player.loadVideoById(video.videoID, 0, "default");
+        }
+        else{
+            this.player.loadVideoById('otHnRgZUs2I', 0, "default");
+        }
+
     }
 
     updateQueue(component){

@@ -1,8 +1,8 @@
 /**
  * Created by brett on 5/1/19.
  */
-
 const RoomModelFactory = require('../models/room.model').RoomModelFactory;
+const UserModel = require('../models/user.model');
 
 const DEBUG_OUTPUT = false;
 const socketLog = (output) => {
@@ -179,7 +179,16 @@ module.exports = {
 
     chatMessage: (roomID, userID, socket, message) => {
         socketLog("[chatMessage] received in room " + roomID + " from user " + userID + " (" + message +")");
-        socket.to(getRoomName(roomID)).emit('chatMessage', userID, message);
+
+        let user= new UserModel(false);
+        user.retrieve(userID)
+        .then((user) => {
+            socket.to(getRoomName(roomID)).emit('chatMessage', user.userName, userID, message);
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+
     }
 
 

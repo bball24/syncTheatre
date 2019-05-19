@@ -234,8 +234,12 @@ class Room {
 
     dequeueVideo(){
         //if q is non-empty remove the next vid and set as current vid
-        if(!this.videoQueue.length == 0){
+        if(this.videoQueue.length > 0){
             this.currentVideo = this.videoQueue.shift();
+        }
+        else{
+            //if q is empty
+            this.currentVideo = "";
         }
     }
 

@@ -62,9 +62,9 @@ export default class Room extends React.Component {
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
         socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
-        socket.on('chatMessage', (userID, message) => {
+        socket.on('chatMessage', (userName, userID, message) => {
             console.log("[H] :: Msg recieved: " + message)
-            this._chatBox.current.addMessage(userID, message);
+            this._chatBox.current.addMessage(userName, userID, message);
         });
         socket.on('updateUsers', () => {
             this._chatBox.current.updateUserList();
