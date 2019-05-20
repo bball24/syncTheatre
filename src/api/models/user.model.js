@@ -192,6 +192,7 @@ class User {
                     reject(err);
                 }
                 if(result){
+                    console.log(result);
                     this.fromJson(result)
                     resolve(result)
                 }
@@ -248,17 +249,46 @@ class User {
     update(doc){
         const self = this;
         return new Promise((resolve, reject) => {
-            //update room model with the provided keys in doc passed in
-            for(let key in doc){
-                self[key] = doc[key];
-            }
 
-            let query = { userID : this.userID };
-            let updateDoc = { $set : this.toJson() };
-            this.db.collection('users').updateOne(query, updateDoc, (err, res) => {
-                if(err) reject(err);
-                resolve(self);
-            })
+            if(doc.userName){
+                this.retrieveByName(doc.userName)
+                .then((userDoc) => {
+                    if(userDoc){
+                        //a user with this name already exists
+                        reject({ code : 1, error: doc.userName + " already exists."});
+                    }
+                    else{
+                        //no users with that name were found so go ahead
+                        //update room model with the provided keys in doc passed in
+                        for(let key in doc){
+                            self[key] = doc[key];
+                        }
+
+                        let query = { userID : this.userID };
+                        let updateDoc = { $set : this.toJson() };
+                        this.db.collection('users').updateOne(query, updateDoc, (err, res) => {
+                            if(err) reject(err);
+                            resolve(self);
+                        })
+                    }
+                })
+                .catch((err) => {
+                    reject(err);
+                })
+            }
+            else{
+                //update room model with the provided keys in doc passed in
+                for(let key in doc){
+                    self[key] = doc[key];
+                }
+
+                let query = { userID : this.userID };
+                let updateDoc = { $set : this.toJson() };
+                this.db.collection('users').updateOne(query, updateDoc, (err, res) => {
+                    if(err) reject(err);
+                    resolve(self);
+                })
+            }
         });
     }
 

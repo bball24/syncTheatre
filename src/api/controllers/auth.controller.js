@@ -23,11 +23,13 @@ router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
         res.redirect('http://localhost:3000/login/?tok=' + req.user.token + '&uid=' + userDoc.userID );
     })
     .catch((notFound) => {
-        user.registerUser(req.user.displayName, req.user.id, req.user.provider);
+        console.error(notFound);
+        user.registerUser(req.user.id, req.user.id, req.user.provider);
         user.createRegisteredUser().then((doc) => {
             res.redirect('http://localhost:3000/token/?tok=' + req.user.token + '&s=true&uid=' + user.userID )
         })
         .catch((err) => {
+            console.error(err);
             res.redirect('http://localhost:3000/token/?s=false')
         })
     })

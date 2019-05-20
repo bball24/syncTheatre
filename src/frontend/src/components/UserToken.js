@@ -29,7 +29,8 @@ export default class UserToken extends Component {
             apiHost : this.props.apiHost,
             user : {},
             roomName : "",
-            userName : ""
+            userName : "",
+            badName : false
         };
 
     }
@@ -44,7 +45,9 @@ export default class UserToken extends Component {
                 });
             })
             .catch((err) => {
-                console.error(err);
+                console.log(err.message);
+                console.log("errored")
+                //console.error(err);
             })
         }
     }
@@ -73,7 +76,11 @@ export default class UserToken extends Component {
             });
         })
         .catch((err) => {
-            console.error(err);
+            if(err.response.data.code && err.response.data.code === 1){
+                this.setState({
+                    badName : true
+                })
+            }
         });
     };
 
@@ -108,6 +115,7 @@ export default class UserToken extends Component {
                                         onChange={this.handleChange}
                                     />
                                 </FormGroup>
+                                {this.state.badName && <span>A user with that name already exists. Please choose a different user name.</span>}
                                 <Button
                                     className="btn btn-primary"
                                     block
