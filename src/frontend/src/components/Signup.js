@@ -33,6 +33,7 @@ export default class Signup extends Component {
                     <FormGroup controlId="email" bsSize="large">
                         <ControlLabel>Email</ControlLabel>
                         <FormControl
+                            className="myinput"
                             autoFocus
                             type="email"
                             value={this.state.email}
@@ -42,12 +43,14 @@ export default class Signup extends Component {
                     <FormGroup controlId="password" bsSize="large">
                         <ControlLabel>Password</ControlLabel>
                         <FormControl
+                            className="myinput"
                             value={this.state.password}
                             onChange={this.handleChange}
                             type="password"
                         />
                     </FormGroup>
                     <Button
+                        className="register"
                         block
                         bsSize="large"
                         disabled={!this.validateForm()}
