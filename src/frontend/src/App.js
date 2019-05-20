@@ -42,7 +42,7 @@ class App extends Component {
         else{
             return (
                 <div className="Appcontainer">
-                    <Navbar fluid collapseOnSelect>
+                    <Navbar className="navbar" fluid collapseOnSelect>
                         <Navbar.Header>
                             <Navbar.Brand>
                                 <Link to="/"><FaHome></FaHome></Link>
