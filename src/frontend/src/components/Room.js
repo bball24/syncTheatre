@@ -103,7 +103,7 @@ export default class Room extends React.Component {
             autoplay: 1,
             controls : 0,
             disablekb : 1,
-            fs : 0,
+            fs : 1,
             modestbranding: 1,
         }
 
