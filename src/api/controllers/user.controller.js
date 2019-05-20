@@ -66,7 +66,20 @@ router.get('/roomInfo/:userName', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    res.status(501).json({ status : "Not Yet Implemented"})
+    const userID = req.params.id;
+    const doc = req.body;
+    let user = new UserModel(false);
+    user.retrieve(userID)
+    .then((currentDoc) => {
+        return user.update(doc)
+    })
+    .then((updatedModel) => {
+        res.status(200).json(updatedModel.toJson());
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json(err);
+    })
 });
 
 router.delete('/:id', (req, res) => {

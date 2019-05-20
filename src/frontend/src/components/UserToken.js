@@ -8,7 +8,7 @@ import queryString from 'query-string';
 import axios from 'axios';
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
-import { FaYoutube } from "react-icons/fa";
+import { Redirect } from 'react-router-dom'
 
 /**
  * Urls that follow this syntax will work
@@ -32,7 +32,6 @@ export default class UserToken extends Component {
             userName : ""
         };
 
-
     }
 
     componentWillMount(){
@@ -51,7 +50,7 @@ export default class UserToken extends Component {
     }
 
     validateForm() {
-        return this.state.roomName.length < 30 && this.state.userName.length < 30;
+        return this.state.userName.length < 30 && this.state.userName.match(/^[a-z0-9]+$/i);
     }
 
     handleChange = event => {
@@ -62,6 +61,26 @@ export default class UserToken extends Component {
 
     handleSubmit = event => {
         event.preventDefault();
+        const userInfo = {
+            userName : this.state.userName
+        }
+        axios.put(this.state.apiHost + '/api/users/' + this.state.userID, userInfo)
+        .then((user) => {
+            sessionStorage.setItem('SyncTheatre:userID', JSON.stringify(user.data.userID));
+            sessionStorage.setItem('SyncTheatre:token', JSON.stringify(this.state.token));
+            this.setState({
+                redirect : true
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+    };
+
+    renderRedirect() {
+        if(this.state.redirect){
+            return <Redirect to='/' />
+        }
     }
 
     render() {
@@ -69,12 +88,13 @@ export default class UserToken extends Component {
         if(this.state.successful === true){
             return (
                 <div className="outerWrap">
+                    {this.renderRedirect()}
                     <div className="innerWrap">
                         <h2>Welcome to SyncTheatre!</h2>
                         <div className="introText">
                             <span className="innerText">
                                 You have successfully created a new account!
-                                Use the form below to choose your user name and room name.
+                                Use the form below to choose your user name.
                             </span>
                         </div>
                         <div className="userIntroForm">
@@ -86,14 +106,6 @@ export default class UserToken extends Component {
                                         type="text"
                                         value={this.state.userName}
                                         onChange={this.handleChange}
-                                    />
-                                </FormGroup>
-                                <FormGroup controlId="roomName" bsSize="large">
-                                    <ControlLabel><FaYoutube/> Room Name</ControlLabel>
-                                    <FormControl
-                                        value={this.state.roomName}
-                                        onChange={this.handleChange}
-                                        type="text"
                                     />
                                 </FormGroup>
                                 <Button

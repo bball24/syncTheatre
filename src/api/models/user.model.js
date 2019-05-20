@@ -202,6 +202,27 @@ class User {
         })
     }
 
+    retrieveByOauthID(oauthID){
+        const self = this;
+        return new Promise((resolve, reject) => {
+            this.db.collection('users').findOne(
+                { oauthID : oauthID},
+                { projection: {_id:0}},
+                (err, doc) => {
+                    if(err){
+                        reject(err);
+                    }
+                    if(doc){
+                        self.fromJson(doc)
+                        resolve(doc)
+                    }
+                    else{
+                        reject({ error: "oauthID: " + oauthID + " was not found in retrieveByOauthID."});
+                    }
+                })
+        });
+    }
+
     retrieve(id){
         const self = this;
         return new Promise((resolve, reject) => {
@@ -222,6 +243,23 @@ class User {
             })
         });
 
+    }
+
+    update(doc){
+        const self = this;
+        return new Promise((resolve, reject) => {
+            //update room model with the provided keys in doc passed in
+            for(let key in doc){
+                self[key] = doc[key];
+            }
+
+            let query = { userID : this.userID };
+            let updateDoc = { $set : this.toJson() };
+            this.db.collection('users').updateOne(query, updateDoc, (err, res) => {
+                if(err) reject(err);
+                resolve(self);
+            })
+        });
     }
 
     // ---- Custom User Functionality ---
