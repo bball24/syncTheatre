@@ -52,7 +52,7 @@ export default class SendChatMessage extends React.Component {
     render(){
         return(
             <form onSubmit={this.handleSubmit}>
-                <label>
+                <label className="chatInput">
                     Send Message:
                     <input type="text" value={this.state.message} onChange={this.handleChange} placeholder="Type Here"/>
                 </label>
