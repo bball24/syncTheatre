@@ -1,5 +1,4 @@
 var mongoUtil = require( '../mongo.util' );
-let UserModel = require('./user.model');
 let VideoModel = require('./video.model');
 
 const RoomStatus = {
@@ -56,33 +55,6 @@ class Room {
         this.createdAt = doc.createdAt;
     }
 
-    /**
-     * getFounderID
-     * returns a promise to a founderID for the room.
-     * If the founderID attribute is -1 a temporary user
-     * is created and that userID is returned. If the founderID
-     * is not -1, then the founderID is simply returned.
-     * @returns {Promise} a promise to the founderID for the room.
-     */
-    getFounderID(){
-        let self = this;
-        return new Promise((resolve, reject) => {
-            // if founderID was -1, then create a temp user for this person
-            if (self.founderID === -1) {
-                new UserModel(true).save()
-                .then((userDoc) => {
-                    resolve(userDoc.userID);
-                })
-                .catch((err) => {
-                    reject({ error: err, message : "Could not create temp user"});
-                })
-            }
-            else {
-                // User was a registered user, we can just use his ID!
-                resolve(self.founderID);
-            }
-        });
-    }
 
     // ----- Databasing Methods ---------
 
@@ -99,12 +71,11 @@ class Room {
     create(){
         let self = this;
         return new Promise((resolve, reject) => {
-            self.getFounderID()
-            .then((founderID) => {
-                self.founderID = founderID;
-                self.partyLeaderID = founderID;
-                return self.generateRoomID();
-            })
+            if(self.founderID == -1){
+                reject({ error : "founderID was -1 in RoomModel Create"})
+            }
+            self.partyLeaderID = self.founderID;
+            self.generateRoomID()
             .then((roomID) => {
                 self.roomID = roomID;
                 self.syncRoom = 'syncRoom' + roomID;
@@ -135,6 +106,7 @@ class Room {
             //update room model with the provided keys in doc passed in
             for(let key in doc){
                 self[key] = doc[key];
+                //console.log(key + " : " + doc[key])
             }
             let query = { roomID : this.roomID };
             let updateDoc = { $set : this.toJson() };
@@ -155,19 +127,20 @@ class Room {
     retrieve(id){
         const self = this;
         return new Promise((resolve, reject) => {
-            this.db.collection('rooms').findOne({roomID:Number(id)}, { projection: {_id:0}}, (err, doc) => {
-                if(err){
-                    reject(err);
-                }
-
-                if(doc){
-                    self.fromJson(doc)
-                    resolve(doc)
-                }
-                else{
-                    reject({ error: "RoomID: "+ id+ " was not found in retrieve."});
-                }
-
+            this.db.collection('rooms').findOne(
+                { roomID : Number(id)},
+                { projection: {_id:0}},
+                (err, doc) => {
+                    if(err){
+                        reject(err);
+                    }
+                    if(doc){
+                        self.fromJson(doc)
+                        resolve(doc)
+                    }
+                    else{
+                        reject({ error: "RoomID: "+ id+ " was not found in retrieve."});
+                    }
             })
         });
     }
@@ -193,43 +166,101 @@ class Room {
         return this.currentVideo;
     }
 
+    joinUser(userID){
+        this.users = [...this.users, userID];
+    }
+
+    disconnectUser(userID){
+        let users = [];
+        this.users.forEach((id) => {
+            if(id !== userID){
+                users.push(id)
+            }
+        });
+
+        this.users = users;
+    }
+
+    getUserList(){
+        return new Promise((resolve, reject) => {
+            let promises = [];
+            this.users.forEach((userID) => {
+                let p = new Promise((accept, decline) => {
+                    this.db.collection('users').findOne(
+                        { userID : Number(userID)},
+                        { projection: {_id:0}},
+                        (err, doc) => {
+                            if(err){
+                                decline(err);
+                            }
+                            if(doc){
+                                accept(doc)
+                            }
+                            else{
+                                decline({ error: "UserID: "+ userID + " was not found in retrieve."});
+                            }
+                        })
+                });
+                promises.push(p);
+            });
+            Promise.all(promises).then((users) => {
+                let returnUsers = []
+                users.forEach((user) => {
+
+                    let isPartyLeader = false;
+                    let isFounder = false;
+
+                    if(user.userID === this.partyLeaderID){
+                        isPartyLeader = true;
+                    }
+                    if(user.userID === this.founderID){
+                        isFounder = true;
+                    }
+
+                    returnUsers.push({
+                        userID: user.userID,
+                        userName: user.userName,
+                        isPartyLeader : isPartyLeader,
+                        isFounder : isFounder
+                    });
+                });
+                resolve(returnUsers);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        })
+    }
 
     enqueueVideo(videoID){
-        //if q is empty, set current vid to new vid then push it
-        if(this.videoQueue.length == 0){
-            this.currentVideo = videoID;
-            let getSocket = require('../sockets').getSocket;
-            const socket = getSocket();
-            socket.to(this.syncRoom).emit('loadVideo', this.currentVideo);
-        }
-        this.videoQueue.push(videoID);
-
+        const self = this;
+        return new Promise((resolve, reject) => {
+            let vid = new VideoModel("", -1);
+            vid.setVideoID(videoID);
+            vid.getVideoDetails()
+            .then((vidDetail) => {
+                self.videoQueue.push(vidDetail);
+                resolve(self);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        })
     }
 
     dequeueVideo(){
         //if q is non-empty remove the next vid and set as current vid
-        if(!this.videoQueue.length == 0){
+        if(this.videoQueue.length > 0){
             this.currentVideo = this.videoQueue.shift();
+        }
+        else{
+            //if q is empty
+            this.currentVideo = "";
         }
     }
 
     getVideoQueue(){
-        return new Promise((resolve, reject) => {
-            let promises = [];
-            this.videoQueue.forEach((videoID) => {
-                let vid = new VideoModel("", -1);
-                vid.setVideoID(videoID);
-                promises.push(vid.getVideoDetails());
-            })
-            Promise.all(promises).then((vids) => {
-                resolve(vids);
-            })
-            .catch((err) => {
-                console.error(err);
-                reject(err);
-            })
-        })
-
+        return this.videoQueue;
     }
 
     /**

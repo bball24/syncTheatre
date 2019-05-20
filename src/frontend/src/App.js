@@ -4,7 +4,11 @@ import { Nav, Navbar, NavItem } from "react-bootstrap";
 import "./App.scss";
 import Routes from "./Routes";
 import { FaHome } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
+
 import axios from "axios"
+
 
 class App extends Component {
     constructor(props){
@@ -37,8 +41,8 @@ class App extends Component {
         }
         else{
             return (
-                <div className="App container">
-                    <Navbar fluid collapseOnSelect>
+                <div className="Appcontainer">
+                    <Navbar className="navbar" fluid collapseOnSelect>
                         <Navbar.Header>
                             <Navbar.Brand>
                                 <Link to="/"><FaHome></FaHome></Link>
@@ -47,9 +51,8 @@ class App extends Component {
                         </Navbar.Header>
                         <Navbar.Collapse>
                             <Nav pullRight>
-                                <NavItem href="/signup">Signup</NavItem>
-                                <NavItem href="/login">Login</NavItem>
-                                <NavItem href='/room'> Room </NavItem>
+                                <NavItem href="/signup"><FaUser/> Signup</NavItem>
+                                <NavItem href='/room'><FaYoutube/> Room</NavItem>
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>

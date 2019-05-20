@@ -4,6 +4,7 @@
 
 import React from 'react';
 import axios from 'axios';
+import "./AddVideo.scss"
 
 export default class AddVideo extends React.Component {
     constructor(props){
@@ -32,11 +33,15 @@ export default class AddVideo extends React.Component {
         const postData = {
             userID : this.state.userID,
             roomID : this.state.roomID,
-            videoURL : [this.state.youtubeURL]
+            videoURL : this.state.youtubeURL
         }
         axios.post(this.state.apiHost + '/api/rooms/addVideo', postData)
         .then((data) => {
             this.socket.emit('updateQueue', this.state.roomID, this.state.userID);
+
+            this.setState({
+                youtubeURL : ""
+            });
         })
         .catch((err) => {
             console.error(err);
@@ -45,9 +50,9 @@ export default class AddVideo extends React.Component {
 
     render(){
         return(
-            <form onSubmit={this.handleSubmit}>
+            <form className='addVideo' onSubmit={this.handleSubmit}>
                 <label>
-                Add Video:
+                Add Video
                     <input type="text" value={this.state.youtubeURL} onChange={this.handleChange}/>
                 </label>
                 <input type="submit" value="Add" />

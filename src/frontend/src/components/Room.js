@@ -4,7 +4,9 @@ import openSocket from 'socket.io-client';
 import SyncLib from '../lib/sync-lib';
 import AddVideo from './AddVideo';
 import VideoQueue from './VideoQueue';
+import ChatBox from './ChatBox';
 import "./Room.scss"
+import "./Home.scss"
 import axios from "axios"
 
 // https://youtu.be/dQw4w9WgXcQ
@@ -13,8 +15,18 @@ export default class Room extends React.Component {
 
     constructor(props){
         super(props);
-        const roomID = this.props.match.params.roomID;
+        let roomID;
+
+        // init room and userIDs. if roomID was passed in,
+        // it's a permanent room and the roomID will not be
+        // in the url params. Otherwise it will be and its a temp room.
+        if(!this.props.roomID){ roomID = this.props.match.params.roomID; }
+        else{ roomID = this.props.roomID; }
         let userID = this.props.userID;
+
+        //component references
+        this._videoQueueComponent = React.createRef();
+        this._chatBox = React.createRef();
 
         //debug
         console.log({Page: 'Room', roomID: roomID, userID: userID});
@@ -41,22 +53,25 @@ export default class Room extends React.Component {
         lib.syncTick = lib.syncTick.bind(lib);
         lib.startSync = lib.startSync.bind(lib);
         lib.setPlayer = lib.setPlayer.bind(lib);
+        lib.resLeader = lib.resLeader.bind(lib);
+        lib.chatMessage = lib.chatMessage.bind(lib);
+        lib.updateUsers = lib.updateUsers.bind(lib);
         this.videoReady = this.videoReady.bind(this);
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
-        socket.on('loadVideo', (videoID) => {
-            this._videoQueueComponent.current.updateQueue();
-            lib.loadVideo(videoID)
-        });
+        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent, this)});
         socket.on('error', (err) => {lib.onError(err)});
         socket.on('changeSpeed', (speed) => {lib.changeSpeed(speed)});
         socket.on('playVideo', () => {lib.playVideo()});
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
         socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
+        socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox, this)});
+        socket.on('chatMessage', (name, id, msg) => {lib.chatMessage(name, id, msg, this._chatBox)});
+        socket.on('updateUsers', () => {lib.updateUsers(this._chatBox)});
 
-
+        //init room state
         this.state = {
             roomID : roomID,
             userID : userID,
@@ -64,10 +79,11 @@ export default class Room extends React.Component {
             socket : socket,
             lib : lib,
             player : null,
-            apiHost : this.props.apiHost
+            apiHost : this.props.apiHost,
+            partyLeaderID: -1,
+            founderID: -1
         };
 
-        this._videoQueueComponent = React.createRef();
     }
 
     videoReady(event) {
@@ -75,15 +91,31 @@ export default class Room extends React.Component {
         event.target.pauseVideo();
         this.state.lib.setPlayer(event.target);
         this.state.lib.onPlayerReady(event);
+        this.state.lib.seekVideo(this.state.curTime)
+        this.state.lib.playVideo();
+        console.log("it fired");
     }
 
     render() {
+        // Options found here
+        // https://developers.google.com/youtube/player_parameters
+        let playerVars = {
+            autoplay: 1,
+            controls : 0,
+            disablekb : 1,
+            fs : 0,
+            modestbranding: 1,
+        }
+
+        //user is party leader
+        if(this.state.partyLeaderID == this.state.userID){
+            playerVars.controls = 1;
+            playerVars.disablekb = 0;
+        }
         const opts = {
             height: '390',
             width: '640',
-            playerVars: { // https://developers.google.com/youtube/player_parameters
-                autoplay: 1
-            }
+            playerVars: playerVars
         };
 
         return [
@@ -101,9 +133,32 @@ export default class Room extends React.Component {
                         onError={this.state.lib.onError}
                     />
                 </div>
-                <VideoQueue key="queue" ref={this._videoQueueComponent} userID={this.state.userID} roomID={this.state.roomID} apiHost={this.state.apiHost}/>
+                <ChatBox
+                    className="ChatBox"
+                    key="chat"
+                    ref={this._chatBox}
+                    apiHost = {this.state.apiHost}
+                    userID={this.state.userID}
+                    roomID={this.state.roomID}
+                    socket={this.state.socket}
+                    partyLeaderID={this.state.partyLeaderID}
+                    founderID={this.state.founderID}
+                />
             </div>,
-            <AddVideo key="form" socket={this.state.socket} userID={this.state.userID} roomID={this.state.roomID} apiHost={this.state.apiHost}/>
+            <AddVideo
+                key="form"
+                socket={this.state.socket}
+                userID={this.state.userID}
+                roomID={this.state.roomID}
+                apiHost={this.state.apiHost}/>,
+            <VideoQueue
+                className="VideoQueue"
+                key="queue"
+                ref={this._videoQueueComponent}
+                userID={this.state.userID}
+                roomID={this.state.roomID}
+                apiHost={this.state.apiHost}
+            />,
         ];
     }
 }

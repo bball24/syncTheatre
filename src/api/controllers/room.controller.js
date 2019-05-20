@@ -10,7 +10,10 @@ let RoomModelFactory = require('../models/room.model').RoomModelFactory;
 let VideoModel = require('../models/video.model');
 let mongoUtil = require('../mongo.util');
 
+
+
 //get all rooms up to limit
+// localhost:3001/api/rooms/
 router.get('/', (req, res) => {
     let limit = 10
     RoomModelFactory.getAllRooms(limit)
@@ -28,6 +31,7 @@ router.get('/', (req, res) => {
 });
 
 //get one room
+// localhost:3001/api/rooms/10
 router.get('/:id', (req, res) => {
     //parse room ID from url
     let roomID = req.params.id;
@@ -41,6 +45,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Create Room
+// localhost:3001/api/rooms/
 router.post('/', (req, res) => {
     let founderID = req.body.founderID || -1;
     let room = new RoomModel();
@@ -87,20 +92,18 @@ router.post('/addVideo', (req, res) => {
 	let videoURL = req.body.videoURL;
 
 	//step 2: Instantiate video model
-    let videos = []
-    videoURL.forEach((url) => {
-        videos.push(new VideoModel(url, userID));
-    })
+    let vid = new VideoModel(videoURL, userID);
 
-	//refactor using factory
 	RoomModelFactory.getRoom(roomID).then((room) => {
-        videos.forEach((video) => {
-            let videoID = video.getVideoID();
-            room.enqueueVideo(videoID);
-        })
+        return room.enqueueVideo(vid.getVideoID());
+    })
+    .then((room) => {
         return RoomModelFactory.updateRoom(roomID, room.toJson());
     })
     .then((room) => {
+        let getSocket = require('../sockets').getSocket;
+        const socket = getSocket();
+        socket.to(room.syncRoom).emit('updateQueue');
         res.status(200).json(room.toJson());
     })
     .catch((err) => {
@@ -123,5 +126,41 @@ router.get('/queue/:id', (req, res) => {
     })
 })
 
+//get list of active users in room for specific roomID
+router.get('/users/:id', (req, res) => {
+    const roomID = req.params.id;
+    RoomModelFactory.getRoom(roomID).then((room) => {
+        return room.getUserList();
+    })
+    .then((userList) => {
+        res.status(200).json({ users: userList})
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json(err);
+    })
+})
+
+/**
+ * Returns the userIDs of the founding member
+ * and active party leader
+ *
+ * {
+ *   partyLeaderID : <userID>,
+ *   founderID : <userID>
+ * }
+ */
+router.get('/leadership/:id', (req, res) => {
+    const roomID = req.params.id;
+    RoomModelFactory.getRoom(roomID).then((room) => {
+        res.status(200).json({
+            partyLeaderID : room.partyLeaderID,
+            founderID : room.founderID
+        });
+    })
+    .catch((err) => {
+        res.status(400).json(err);
+    })
+})
 
 module.exports = router;

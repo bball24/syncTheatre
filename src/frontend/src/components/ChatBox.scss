@@ -1,0 +1,36 @@
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.chatList {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 250px;
+}
+
+.crownIcon {
+  color : #ffb02a;
+}
+
+.changePLButton {
+  float: right;
+  padding: 1px 10px;
+}
+
+.userLine {
+  padding-bottom: 3px;
+}
+
+.buttonUp {
+  vertical-align : middle;
+}
+
+.userText {
+  margin-left:5px;
+}

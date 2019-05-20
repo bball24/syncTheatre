@@ -1,62 +1,78 @@
 import React, { Component } from "react";
-import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import "./Signup.scss";
+import GoogleButton from 'react-google-button'
 
 export default class Signup extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            email: "",
-            password: ""
-        };
+            googleAuthHost : 'http://localhost:3001/auth/google',
+            loading: true
+        }
+
+        this.isLoggedIn = this.isLoggedIn.bind(this);
+        this.isLoggedIn();
+
+        this.state.loading = false;
+    };
+
+    isLoggedIn(){
+        let userID = JSON.parse(sessionStorage.getItem('SyncTheatre:userID')) || -1;
+        let tok = JSON.parse(sessionStorage.getItem('SyncTheatre:token')) || -1;
+
+        //if the user has a valid token, they are signed in
+        //as a registered user
+        if(tok === -1){
+            this.state.loggedIn = false;
+        }
+        else{
+            this.state.loggedIn = true;
+        }
     }
 
-    validateForm() {
-        return this.state.email.length > 0 && this.state.password.length > 0;
-    }
-
-    handleChange = event => {
-        this.setState({
-            [event.target.id]: event.target.value
-        });
-    }
-
-    handleSubmit = event => {
-        event.preventDefault();
-    }
 
     render() {
-        return (
-            <div className="Signup">
-                <form onSubmit={this.handleSubmit}>
-                    <FormGroup controlId="email" bsSize="large">
-                        <ControlLabel>Email</ControlLabel>
-                        <FormControl
-                            autoFocus
-                            type="email"
-                            value={this.state.email}
-                            onChange={this.handleChange}
-                        />
-                    </FormGroup>
-                    <FormGroup controlId="password" bsSize="large">
-                        <ControlLabel>Password</ControlLabel>
-                        <FormControl
-                            value={this.state.password}
-                            onChange={this.handleChange}
-                            type="password"
-                        />
-                    </FormGroup>
-                    <Button
-                        block
-                        bsSize="large"
-                        disabled={!this.validateForm()}
-                        type="submit"
-                    >
-                        Register
-                    </Button>
-                </form>
-            </div>
-        );
+        console.log(this.state);
+        if(this.state.loading){
+            return (
+                <div className="outerWrap">
+                    <div className="innerWrap">
+                        <h2>Hang on we're loading..</h2>
+                    </div>
+                </div>
+            );
+        }
+        else if(this.state.loggedIn){
+            return (
+                <div className="outerWrap">
+                    <div className="innerWrap">
+                        <h2>You are already signed in!</h2>
+                        <span className="introText">
+                            Start watching videos with your friends!
+                        </span>
+                    </div>
+                </div>
+            );
+        }
+        else{
+            return (
+                <div className="outerWrap">
+                    <div className="innerWrap">
+                        <h2>Create Account and Sign In</h2>
+                        <span className="introText">
+                        You can create an account by signing in with google.
+                        To log-in to your account, sign-in again. Registered users
+                        get their own private permanent room and a custom user name!
+                    </span>
+                        <div className="googleBtnWrap">
+                            <a href={this.state.googleAuthHost}>
+                                <GoogleButton className="googleButton"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     }
 }

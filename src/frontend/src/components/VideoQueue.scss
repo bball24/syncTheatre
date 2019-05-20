@@ -2,27 +2,24 @@
  * Created by brett on 5/5/19.
  */
 
-.VideoQueue{
-  //background-color: #f8f8f8;
-  //border: 1px solid #eeee;
-  float: right;
-}
 
 .VideoQueue img{
-  width:55px;
-  margin-right:5px;
+  width:100px;
 }
 .VideoQueue ul{
-  padding:0px 5px;
+  padding:0px 1px;
   margin-top:5px;
 }
 
 .VideoQueue li{
   font-size: 10px;
-  margin-bottom: 5px;
+
   list-style: none;
-  border-bottom: 1px solid #f1f1f1;
-  padding: 0px 10px;
+  border: 1px solid black;
+
+  padding: 0px 0px;
+  background: #FF4500;
+
 }
 
 .VideoQueue li:hover{

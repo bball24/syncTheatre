@@ -1,8 +1,15 @@
 /**
  * Created by brett on 5/1/19.
  */
-
 const RoomModelFactory = require('../models/room.model').RoomModelFactory;
+const UserModel = require('../models/user.model');
+
+const DEBUG_OUTPUT = true;
+const socketLog = (output) => {
+    if(DEBUG_OUTPUT){
+        console.log("--->[WS] :: " + output);
+    }
+}
 
 const getRoomName = (roomID) => {
     return 'syncRoom' + roomID;
@@ -29,34 +36,52 @@ const isPartyLeader = (roomID, userID) => {
 module.exports = {
 
     // Request Event Handlers
+    connected : () => {
+        socketLog('[connected] New client connected.');
+    },
 
-    join: (roomID, userID, client) => {
+    join: (roomID, userID, client, socket) => {
         let roomName = 'syncRoom' + roomID
         client.join(roomName);
-        console.log(">[WS][join] Room " + roomName);
+        client.userID = userID;
+        socketLog("[join] Room " + roomName);
         RoomModelFactory.getRoom(roomID).then((room) => {
+            room.joinUser(userID);
             return RoomModelFactory.updateRoom(roomID, room.toJson());
+        })
+        .then((room) => {
+            socket.to(getRoomName(roomID)).emit('updateUsers');
         })
         .catch((err) => {
             console.error(err);
         })
     },
 
-    customDisconnect : (client) => {
-        console.log('>[WS][customDC] :: Client disconnected');
-
-
+    customDisconnect : (userID, roomID, socket) => {
+        socketLog('[customDC] :: user ' + userID + ' disconnected from room ' + roomID);
+        RoomModelFactory.getRoom(roomID).then((room) => {
+            room.disconnectUser(userID);
+            return RoomModelFactory.updateRoom(roomID, room.toJson());
+        })
+        .then((room) => {
+            socket.to(getRoomName(roomID)).emit('updateUsers');
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     },
 
     sync : (roomID, userID, curTime) => {
-        //console.log('>[WS][sync] :: from ' + userID + ' at ' + curTime);
+        //socketLog('>[WS][sync] :: from ' + userID + ' at ' + curTime);
     },
 
     reqVideo : (roomID, client) => {
-        console.log('>[WS][reqVideo] :: sending resVideo event to client');
+        socketLog('[reqVideo] :: sending resVideo event to client');
         RoomModelFactory.getRoom(roomID).then((room) => {
             let youtubeID = room.getCurrentVideo();
+            let partyLeaderID = room.partyLeaderID;
             client.emit('resVideo', youtubeID);
+            client.emit('resLeader', partyLeaderID);
         })
         .catch((err) => {
             console.error(err);
@@ -66,12 +91,12 @@ module.exports = {
 
     //@TODO
     loadVideo : () => {
-        console.log('>[WS][loadVideo] :: ');
+        socketLog('[loadVideo] :: ');
     },
 
     //@TODO
     changeSpeed : () => {
-        console.log('>[WS][changeSpeed]');
+        socketLog('[changeSpeed]');
     },
 
 
@@ -79,7 +104,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                console.log('>[WS][playVideo] :: in roomID:' + roomID);
+                socketLog('[playVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('playVideo');
             }
         })
@@ -93,7 +118,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                console.log('>[WS][pauseVideo] :: in roomID:' + roomID);
+                socketLog('[pauseVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('pauseVideo');
             }
         })
@@ -107,7 +132,7 @@ module.exports = {
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
-                console.log('>[WS][pauseVideo] :: from roomID: ' + roomID);
+                socketLog('[pauseVideo] :: from roomID: ' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('seekVideo', time);
             }
         })
@@ -117,7 +142,7 @@ module.exports = {
     },
 
     doneVideo : (roomID, userID, socket) => {
-        console.log('>[WS][doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
+        socketLog('[doneVideo] :: from userID ' + userID + " in roomID: " + roomID);
         isPartyLeader(roomID, userID)
         .then((isLeader) => {
             if(isLeader){
@@ -125,7 +150,7 @@ module.exports = {
                 .then((room) => {
                     room.dequeueVideo();
                     let nextVideo = room.getCurrentVideo();
-                    console.log('>[WS][loadVideo] emmit.');
+                    socketLog('[loadVideo] emmit.');
                     socket.to(getRoomName(roomID)).emit('loadVideo', nextVideo);
                     //client.broadcast.emit('loadVideo', nextVideo);
 
@@ -152,7 +177,45 @@ module.exports = {
         .catch((err) => {
             console.error(err);
         })
-    }
+    },
+
+    chatMessage: (roomID, userID, socket, message) => {
+        socketLog("[chatMessage] received in room " + roomID + " from user " + userID + " (" + message +")");
+
+        let user= new UserModel(false);
+        user.retrieve(userID)
+        .then((user) => {
+            socket.to(getRoomName(roomID)).emit('chatMessage', user.userName, userID, message);
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+
+    },
+
+    leaderChange : (roomID, userID, newLeaderID, socket) => {
+        socketLog("[leaderChange] UserID: " + userID +
+                  " changed party leader in roomID:" + roomID +
+                  " to new user: " + newLeaderID);
+
+        isPartyLeader(roomID, userID)
+        .then((isLeader) => {
+            if (isLeader) {
+                return RoomModelFactory.updateRoom(roomID, { partyLeaderID : newLeaderID })
+            }
+            else{
+                throw({ error : "User" + userID + "is not leader in Room " + roomID})
+            }
+        })
+        .then((room) => {
+            socket.to(getRoomName(roomID)).emit('resLeader', newLeaderID);
+            socket.to(getRoomName(roomID)).emit('updateUsers');
+            socketLog("Emitting [resLeader]")
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    },
 
 
 }

@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var passport = require("passport"); // at header
 
 var apiRouter = require('./routes/api.router');
 
@@ -17,6 +18,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// init passport for authentication
+app.use(passport.initialize()); // after line no.20 (express.static)
+require("./config/passport.setup");
 
 //allow x-origin form :3000
 // Add headers
@@ -36,6 +41,8 @@ app.use(function (req, res, next) {
 });
 
 // Routers
+let authControllers = require('./controllers/auth.controller');
+app.use('/auth', authControllers);
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
@@ -83,6 +90,7 @@ mongoUtil.connect((err, client) => {
         db.createCollection('counters');
 
         db.collection('rooms').createIndex({roomID : 1}, {unique : true});
+        db.collection('users').createIndex({ userName: "text"});
 
         //init tables
         console.log(">[DB] :: Init Tables");

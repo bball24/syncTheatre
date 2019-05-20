@@ -49,5 +49,4 @@ router.use('/users', userControllers);
 let videoControllers = require('../controllers/video.controller');
 router.use('/videos', videoControllers);
 
-
 module.exports = router;

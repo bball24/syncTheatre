@@ -36,6 +36,44 @@ Then start the API
 
 - `GET /api/`
 
+**users**
+
+`POST /api/users/temp` - create a temp user account
+Making an Http POST request to `http://localhost:3001/api/users/temp`
+returns the following response. Note: no post body is required.
+
+```
+{
+  "userID": 1,
+  "userName": "AnonUser#1",
+  "isGuest": true
+}
+```
+
+`POST /api/users/register` - register a new user account
+Making an Http POST request to `http://localhost:3001/api/users/register`
+with the following post body
+
+```
+{
+	"userName" : "SampleUser99",
+	"oauthID" : "1234ABC",
+	"oauthURL" : "http://google.com/api/oauth..."
+}
+```
+
+returns the following response object
+
+```
+{
+  "userID": 1,
+  "userName": "SampleUser99",
+  "isGuest": false,
+  "oauthID": "1234ABC",
+  "oauthURL": "http://google.com/api/oauth..."
+}
+```
+
 **rooms**
 
 `GET /api/rooms/` - Get all rooms  

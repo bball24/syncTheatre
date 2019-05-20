@@ -12,10 +12,12 @@ export default class CreateRoom extends React.Component {
         super(props);
         const apiHost = this.props.apiHost;
         const userID  = this.props.userID;
+
         this.state = {
             apiHost : apiHost,
             userID : userID
         }
+
         axios.post(apiHost + '/api/rooms/', { founderID : userID})
         .then((room) => {
             this.setState({
