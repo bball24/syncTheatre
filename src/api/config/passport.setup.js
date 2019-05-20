@@ -17,6 +17,8 @@ passport.use(
         clientSecret: '5RDEDU5uaaBuwzUrBRz4IZrg'
     }, (accessToken, refreshToken, profile, done) => {
         // passport callback function
+        console.log('Access Token:' + accessToken);
+        profile.token = accessToken;
         done(null, profile);
     })
 );
