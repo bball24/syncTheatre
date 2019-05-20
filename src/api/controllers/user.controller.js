@@ -11,7 +11,15 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-    res.status(501).json({ status : "Not Yet Implemented "})
+    let userID = req.params.id;
+    new UserModel(false).retrieve(Number(userID))
+    .then((user) => {
+        res.status(200).json(user);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(400).json(err);
+    })
 });
 
 router.post('/', (req, res) => {
