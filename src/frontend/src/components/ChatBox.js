@@ -96,7 +96,7 @@ export default class ChatBox extends React.Component {
     }
 
     renderUsers(){
-        let curUserIsLeader = this.state.partyLeaderID === this.state.userID;
+        let curUserIsLeader = this.state.partyLeaderID == this.state.userID;
         if(this.state.users && this.state.partyLeaderID !== -1) {
             return this.state.users.map((user, i) => {
                 if(user.isPartyLeader){

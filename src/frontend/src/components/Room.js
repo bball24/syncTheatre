@@ -108,7 +108,7 @@ export default class Room extends React.Component {
         }
 
         //user is party leader
-        if(this.state.partyLeaderID === this.state.userID){
+        if(this.state.partyLeaderID == this.state.userID){
             playerVars.controls = 1;
             playerVars.disablekb = 0;
         }
