@@ -38,6 +38,9 @@ export default class SendChatMessage extends React.Component {
     handleSubmit(event){
         const message = this.state.message;
         this.socket.emit('sendMessage', this.state.roomID, this.state.userID, this.state.message);
+        this.setState({
+            message : ""
+        });
         event.preventDefault();
     }
 

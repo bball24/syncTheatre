@@ -38,6 +38,10 @@ export default class AddVideo extends React.Component {
         axios.post(this.state.apiHost + '/api/rooms/addVideo', postData)
         .then((data) => {
             this.socket.emit('updateQueue', this.state.roomID, this.state.userID);
+
+            this.setState({
+                youtubeURL : ""
+            });
         })
         .catch((err) => {
             console.error(err);
