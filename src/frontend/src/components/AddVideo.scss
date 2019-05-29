@@ -1,12 +1,12 @@
 input[type=submit] {
-  width: 10%;
-  background-color: #FF0000;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  //width: 10%;
+  //background-color: #FF0000;
+  //color: white;
+  //padding: 14px 20px;
+  //margin: 8px 0;
+  //border: none;
+  //border-radius: 4px;
+  //cursor: pointer;
 
 }
 .addVideo{
@@ -14,13 +14,11 @@ input[type=submit] {
   margin-left: 2em;
   margin-top: 1em;
 }
-input[type=submit]:hover{
-  background-color: #8B0000;
-}
-input:focus {
-
-  outline:  #FF0000 solid 5px;
-
-
-}
+//input[type=submit]:hover{
+//  background-color: #8B0000;
+//}
+//input:focus {
+//
+//  outline:  #FF0000 solid 5px;
+//}
 

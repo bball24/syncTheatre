@@ -5,9 +5,39 @@
 
 .YTWrapper{
   float: left;
-  margin-right: 45px;
 }
 .VideoQueue{
   float: left;
   margin-left: 34px;
+}
+
+.react-tabs {
+  float: left;
+  width: 50%;
+  height: 390px;
+  padding-left: 3%;
+}
+
+.react-tabs__tab {
+  display: inline-block;
+  border: none
+}
+.react-tabs__tab--selected {
+  background: #2e3546;
+  color: #ccc;
+  border-radius: 5px 5px 0 0;
+}
+
+.react-tabs__tab-list {
+  border: none;
+  padding: 0;
+  margin-bottom: 0px;
+  height:9%;
+}
+
+.react-tabs__tab-panel--selected {
+  display: block;
+  background: #2e3546;
+  height: 91%;
+  padding: 2%;
 }
