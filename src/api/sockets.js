@@ -32,13 +32,14 @@ module.exports = {
             client.on('pauseVideo', (roomID, userID) => {syncLib.pauseVideo(roomID, userID, client)});
             client.on('playVideo', (roomID, userID) => {syncLib.playVideo(roomID, userID, client)});
             client.on('reqVideo', (roomID) => {syncLib.reqVideo(roomID, client)});
-            client.on('sync', (roomID, userID, curTime) => { syncLib.sync(roomID, userID, curTime)});
+            client.on('sync', (roomID, userID, curTime, timeStamp, status) => { syncLib.sync(roomID, userID, curTime, timeStamp, status, socket)});
             client.on('seekVideo', (roomID, userID, time) => {syncLib.seekVideo(roomID, userID, time, client)});
             client.on('disconnect', (client) => {syncLib.customDisconnect(socketUserID, socketRoomID, socket)});
             client.on('doneVideo', (roomID, userID) => {syncLib.doneVideo(roomID, userID, socket)});
             client.on('updateQueue', (roomID, userID) => {syncLib.updateQueue(roomID, userID, socket)});
             client.on('sendMessage', (roomID, userID, message) => {syncLib.chatMessage(roomID, userID, socket, message)});
             client.on('leaderChange', (roomID, userID, newLeaderID) => {syncLib.leaderChange(roomID, userID, newLeaderID, socket)});
+            client.on('latencyPing', () => {client.emit('latencyPong')});
 
             _client = client;
         });

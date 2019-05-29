@@ -71,8 +71,17 @@ module.exports = {
         })
     },
 
-    sync : (roomID, userID, curTime) => {
-        //socketLog('>[WS][sync] :: from ' + userID + ' at ' + curTime);
+    sync : (roomID, userID, curTime, timeStamp, status, socket) => {
+        isPartyLeader(roomID, userID)
+        .then((isLeader) => {
+            if(isLeader){
+                socketLog('[playVideo] :: in roomID:' + roomID);
+                socket.to(getRoomName(roomID)).emit('syncTime', curTime, timeStamp, status);
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     },
 
     reqVideo : (roomID, client) => {
@@ -82,6 +91,14 @@ module.exports = {
             let partyLeaderID = room.partyLeaderID;
             client.emit('resVideo', youtubeID);
             client.emit('resLeader', partyLeaderID);
+
+            if(room.status == 'PLAYING'){
+                client.emit('playVideo');
+            }
+            else if(room.status == 'PAUSED'){
+                client.emit('pauseVideo');
+            }
+
         })
         .catch((err) => {
             console.error(err);
@@ -106,6 +123,14 @@ module.exports = {
             if(isLeader){
                 socketLog('[playVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('playVideo');
+                RoomModelFactory.updateRoom(roomID, { roomStatus: 'PLAYING'})
+                .then((room) => {
+                    console.log("room updated to PLAYING");
+                    console.log(room);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
             }
         })
         .catch((err) => {
@@ -120,8 +145,18 @@ module.exports = {
             if(isLeader){
                 socketLog('[pauseVideo] :: in roomID:' + roomID);
                 client.to(getRoomName(roomID)).broadcast.emit('pauseVideo');
+
+                RoomModelFactory.updateRoom(roomID, { roomStatus: 'PAUSED'})
+                .then((room) => {
+                    console.log("room updated to PAUSED");
+                    console.log(room);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
             }
         })
+
         .catch((err) => {
             console.error(err);
         })

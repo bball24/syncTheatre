@@ -32,7 +32,7 @@ export default class Room extends React.Component {
         console.log({Page: 'Room', roomID: roomID, userID: userID});
 
         // connect to web socket
-        const socketURL = 'http://localhost:3001/rooms';
+        const socketURL = this.props.apiHost + '/rooms';
         const socket = openSocket(socketURL);
         const lib = new SyncLib(roomID, userID, socket);
 
@@ -70,6 +70,8 @@ export default class Room extends React.Component {
         socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox, this)});
         socket.on('chatMessage', (name, id, msg) => {lib.chatMessage(name, id, msg, this._chatBox)});
         socket.on('updateUsers', () => {lib.updateUsers(this._chatBox)});
+        socket.on('latencyPong', () => {lib.latencyPong()});
+        socket.on('syncTime', (curTime, latency, status) =>{lib.syncTime(curTime, latency, status)});
 
         //init room state
         this.state = {
@@ -111,6 +113,10 @@ export default class Room extends React.Component {
         if(this.state.partyLeaderID == this.state.userID){
             playerVars.controls = 1;
             playerVars.disablekb = 0;
+            this.state.lib.setPartylead(true);
+        }
+        else{
+            this.state.lib.setPartylead(false);
         }
         const opts = {
             height: '390',
