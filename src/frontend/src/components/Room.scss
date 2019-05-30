@@ -1,21 +1,24 @@
 .Room {
   display: flow-root;
-  margin: 0em 2em;
+  padding: 1%;
+  background-color: #292b2e;
 }
 
-.YTWrapper{
+.YTWrapper div{
   float: left;
+  width:70%;
 }
-.VideoQueue{
-  float: left;
-  margin-left: 34px;
+
+.YTWrapper iframe{
+  width: 100%;
 }
 
 .react-tabs {
   float: left;
-  width: 50%;
+  width: 30%;
   height: 390px;
-  padding-left: 3%;
+  padding-left: 1%;
+  font-size:12px;
 }
 
 .react-tabs__tab {
@@ -23,9 +26,10 @@
   border: none
 }
 .react-tabs__tab--selected {
-  background: #2e3546;
+  background-color: #292b2e;
   color: #ccc;
   border-radius: 5px 5px 0 0;
+  font-weight:bold;
 }
 
 .react-tabs__tab-list {
@@ -37,7 +41,7 @@
 
 .react-tabs__tab-panel--selected {
   display: block;
-  background: #2e3546;
+  background-color: #292b2e;
   height: 91%;
-  padding: 2%;
+  padding: 0%;
 }

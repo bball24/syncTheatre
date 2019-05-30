@@ -40,19 +40,26 @@ export default class VideoQueue extends React.Component {
 
     renderVids(){
         if(this.state.videoQueue){
-            return this.state.videoQueue.map((vid, i) =><li key={i}><img src={vid.thumb.url} />{vid.title}</li>);
+            return this.state.videoQueue.map((vid, i) => {
+                return(<div className='vid' draggable key={i}>
+                    <div className="vidThumb">
+                        <img src={vid.thumb.url} />
+                    </div>
+                    <span className="vidTitle">
+                        {vid.title}
+                    </span>
+                </div>);
+            });
         }
         else{
-            return <li>Loading..</li>
+            return <div>Loading..</div>
         }
     }
 
     render(){
         return(
             <div className="VideoQueue">
-                <ul>
                     {this.renderVids()}
-                </ul>
             </div>
         )
     }

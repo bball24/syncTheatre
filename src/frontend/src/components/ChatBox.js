@@ -148,7 +148,7 @@ export default class ChatBox extends React.Component {
             return this.state.messages.map((msg, i) => {
                 return(
                     <div class="chatMessage" key={i}>
-                        <span class="chatUser">{msg.userName}: </span>
+                        <span class="chatUser">{msg.userName}:  </span>
                         <span class="chatText">{msg.text}</span>
                     </div>
                 );

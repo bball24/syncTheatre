@@ -11,21 +11,32 @@
 .chatList {
   overflow-y: auto;
   overflow-x: hidden;
-  height: 19em;
-  background: #f3f3f3;
+  height: 26.5em;
+  font-size : 12px;
 }
 
 .crownIcon {
   color : #ffb02a;
 }
 
+.UserList{
+  font-size: 12px;
+  overflow-y: scroll;
+  height: 29.5em;
+}
+
 .changePLButton {
   float: right;
-  padding: 1px 10px;
+  padding: 0px 3px;
+  font-size: 11px;
+  background-color: #2c3c7c;
+  border: none;
+  color: white;
+  margin-right: 5px;
 }
 
 .userLine {
-  padding-bottom: 3px;
+  padding-bottom: 5px;
 }
 
 .buttonUp {
@@ -34,4 +45,9 @@
 
 .userText {
   margin-left:5px;
+}
+
+.chatUser{
+  font-weight:bold;
+  margin-right:1px;
 }
