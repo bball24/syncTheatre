@@ -10,6 +10,9 @@ export default class SyncLib {
         this.userID = userID;
         this.player = null;
         this.socket = socket;
+        this.startTime = null;
+        this.latency = 0;   // in ms
+        this.isPartyLead = false;
     }
 
     socketLog(output){
@@ -24,17 +27,88 @@ export default class SyncLib {
     }
 
     startSync(){
-        setInterval(() => {this.syncTick(this.socket)}, 1500);
+        setInterval(() => {this.syncTick(this.socket)}, 1000);
     }
 
-    syncTick(socket){
-        socket.emit("sync", this.roomID, this.userID, Date.now());
+    setPartylead(isLead){
+        this.isPartyLead = isLead;
+    }
+
+    syncTick(){
+
+        if(this.isPartyLead){
+            //if the user is a party leader, emit the current time of the video
+            // as well as a timestamp back to the server. This is used for
+            // syncing clients up to the party leader
+            let playerState = this.player.getPlayerState();
+            let status;
+            if(playerState == 1){
+                status = 'PLAYING';
+            }
+            else{
+                status = 'PAUSED';
+            }
+            console.log(status);
+            this.socket.emit('sync', this.roomID, this.userID, this.player.getCurrentTime(), Date.now(), status);
+        }
     };
+
+    latencyPong(){
+        this.latency = Date.now() - this.startTime;
+    }
+
+    syncTime(hostTime, timeStamp, status){
+        if(this.player && !this.isPartyLead){
+            let lag = (Date.now() - timeStamp)/1000;
+            let clientTime = this.player.getCurrentTime();
+            let adjustedVideoTime = hostTime;
+            let syncDiff = ((clientTime)/ adjustedVideoTime) * 100;
+
+            if(syncDiff < 99 || syncDiff > 101){
+                // not in 99 - 100
+                this.player.setPlaybackRate(1);
+                this.player.seekTo(adjustedVideoTime);
+            }
+            else if(syncDiff > 101){
+                this.player.setPlaybackRate(0.5);
+            }
+            else if(syncDiff < 99){
+                //in 99.0 - 99.5
+                this.player.setPlaybackRate(1.5);
+            }
+            else{
+                this.player.setPlaybackRate(1);
+            }
+
+            //sync the playback
+            let playerState = this.player.getPlayerState();
+            let playerStatus;
+            if(playerState == 1){
+                playerStatus = 'PLAYING';
+            }
+            else{
+                playerStatus = 'PAUSED';
+            }
+
+            if(status != playerStatus){
+                if(status == 'PLAYING'){
+                    this.playVideo();
+                }
+                else{
+                    this.pauseVideo();
+                }
+            }
+            console.log("Client player: " + playerStatus)
+            console.log("Party Leader Player: " + status);
+
+            this.socketLog('[syncTime] hostTime: ' + adjustedVideoTime + ' | clientTime: ' + clientTime + ' | syncDiff: ' + syncDiff);
+        }
+    }
 
     connect(){
         this.socketLog('[Connected]');
         this.socket.emit('join', this.roomID, this.userID);
-        //this.startSync();
+        this.startSync();
     }
 
     onError(err){
@@ -82,12 +156,15 @@ export default class SyncLib {
         this.player.seekTo(time);
     }
 
-    loadVideo(video, queue, room){
+    loadVideo(video, queue, room, addVideo){
         room.setState({
             videoID : video.videoID
         });
         this.socketLog('[loadVideo] loading video:' + video);
         queue.current.updateQueue();
+        if(addVideo){
+            addVideo.current.setCurrentVideo(video)
+        }
         if(video && video.videoID !== ""){
             this.socketLog(video);
             this.player.loadVideoById(video.videoID, 0, "default");

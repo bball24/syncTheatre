@@ -6,6 +6,7 @@ var logger = require('morgan');
 var passport = require("passport"); // at header
 
 var apiRouter = require('./routes/api.router');
+var cors = require('cors');
 
 var app = express();
 
@@ -25,20 +26,22 @@ require("./config/passport.setup");
 
 //allow x-origin form :3000
 // Add headers
-app.use(function (req, res, next) {
+// app.use(function (req, res, next) {
+//
+//     // Website you wish to allow to connect
+//     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+//
+//     // Request methods you wish to allow
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+//
+//     // Request headers you wish to allow
+//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+//
+//     // Pass to next layer of middleware
+//     next();
+// });
 
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Pass to next layer of middleware
-    next();
-});
+app.use(cors());
 
 // Routers
 let authControllers = require('./controllers/auth.controller');

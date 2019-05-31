@@ -27,12 +27,13 @@ export default class Room extends React.Component {
         //component references
         this._videoQueueComponent = React.createRef();
         this._chatBox = React.createRef();
+        this._addVideoComponent = React.createRef();
 
         //debug
         console.log({Page: 'Room', roomID: roomID, userID: userID});
 
         // connect to web socket
-        const socketURL = 'http://localhost:3001/rooms';
+        const socketURL = this.props.apiHost + '/rooms';
         const socket = openSocket(socketURL);
         const lib = new SyncLib(roomID, userID, socket);
 
@@ -60,7 +61,7 @@ export default class Room extends React.Component {
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
-        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent, this)});
+        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent, this, this._addVideoComponent)});
         socket.on('error', (err) => {lib.onError(err)});
         socket.on('changeSpeed', (speed) => {lib.changeSpeed(speed)});
         socket.on('playVideo', () => {lib.playVideo()});
@@ -70,6 +71,8 @@ export default class Room extends React.Component {
         socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox, this)});
         socket.on('chatMessage', (name, id, msg) => {lib.chatMessage(name, id, msg, this._chatBox)});
         socket.on('updateUsers', () => {lib.updateUsers(this._chatBox)});
+        socket.on('latencyPong', () => {lib.latencyPong()});
+        socket.on('syncTime', (curTime, latency, status) =>{lib.syncTime(curTime, latency, status)});
 
         //init room state
         this.state = {
@@ -111,6 +114,10 @@ export default class Room extends React.Component {
         if(this.state.partyLeaderID == this.state.userID){
             playerVars.controls = 1;
             playerVars.disablekb = 0;
+            this.state.lib.setPartylead(true);
+        }
+        else{
+            this.state.lib.setPartylead(false);
         }
         const opts = {
             height: '390',
@@ -144,21 +151,23 @@ export default class Room extends React.Component {
                     partyLeaderID={this.state.partyLeaderID}
                     founderID={this.state.founderID}
                 />
-            </div>,
-            <AddVideo
-                key="form"
-                socket={this.state.socket}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-                apiHost={this.state.apiHost}/>,
-            <VideoQueue
-                className="VideoQueue"
-                key="queue"
-                ref={this._videoQueueComponent}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-                apiHost={this.state.apiHost}
-            />,
+                <VideoQueue
+                    className="VideoQueue"
+                    key="queue"
+                    ref={this._videoQueueComponent}
+                    userID={this.state.userID}
+                    roomID={this.state.roomID}
+                    apiHost={this.state.apiHost}
+                    socket={this.state.socket}
+                />
+                <AddVideo
+                    key="form"
+                    socket={this.state.socket}
+                    userID={this.state.userID}
+                    roomID={this.state.roomID}
+                    apiHost={this.state.apiHost}
+                    ref={this._addVideoComponent}/>
+            </div>
         ];
     }
 }
