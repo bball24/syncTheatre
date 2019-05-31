@@ -1,26 +1,64 @@
-input[type=submit] {
-  width: 10%;
-  background-color: #FF0000;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-
+.addVideoWrap{
+  width: 30%;
+  float: left;
+  height: 17em;
+  background-color: #292b2e;
+  font-size: 10px;
+  border-top: 1px dotted #37393c;
 }
-.addVideo{
-  position: relative;
-  margin-left: 2em;
+
+.addVideoInnerWrap{
+  width: 90%;
+  margin: 0 auto;
   margin-top: 1em;
 }
-input[type=submit]:hover{
-  background-color: #8B0000;
+
+.inputWrap{
+  width:75%;
+  float:left;
 }
-input:focus {
-
-  outline:  #FF0000 solid 5px;
-
-
+.inputWrap input{
+  width: 100%;
+  font-size: 11px;
+  height: 3em;
+  background-color: #434343;
+  border: none;
 }
 
+.buttonWrap{
+  width:25%;
+  float:left;
+}
+
+.buttonWrap button{
+  margin: 0 auto;
+  text-align: center;
+  display: block;
+  font-size: 11px;
+  height: 3em;
+  padding: .5em 3.5em;
+  vertical-align: middle;
+}
+
+/** Video Info **/
+.videoInfoImg{
+  width:7em;
+}
+
+.videoInfoTitle{
+  margin-left:2em;
+}
+
+.videoInfoWrap{
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 1em;
+}
+
+.videoInfoLabel{
+  width: 100%;
+  margin-right: 25%;
+  margin-bottom: 1em;
+  float: left;
+  //border-bottom: 1px solid gray;
+}

@@ -27,6 +27,7 @@ export default class Room extends React.Component {
         //component references
         this._videoQueueComponent = React.createRef();
         this._chatBox = React.createRef();
+        this._addVideoComponent = React.createRef();
 
         //debug
         console.log({Page: 'Room', roomID: roomID, userID: userID});
@@ -60,7 +61,7 @@ export default class Room extends React.Component {
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
-        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent, this)});
+        socket.on('loadVideo', (videoID) => {lib.loadVideo(videoID, this._videoQueueComponent, this, this._addVideoComponent)});
         socket.on('error', (err) => {lib.onError(err)});
         socket.on('changeSpeed', (speed) => {lib.changeSpeed(speed)});
         socket.on('playVideo', () => {lib.playVideo()});
@@ -150,21 +151,22 @@ export default class Room extends React.Component {
                     partyLeaderID={this.state.partyLeaderID}
                     founderID={this.state.founderID}
                 />
-            </div>,
-            <AddVideo
-                key="form"
-                socket={this.state.socket}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-                apiHost={this.state.apiHost}/>,
-            <VideoQueue
-                className="VideoQueue"
-                key="queue"
-                ref={this._videoQueueComponent}
-                userID={this.state.userID}
-                roomID={this.state.roomID}
-                apiHost={this.state.apiHost}
-            />,
+                <VideoQueue
+                    className="VideoQueue"
+                    key="queue"
+                    ref={this._videoQueueComponent}
+                    userID={this.state.userID}
+                    roomID={this.state.roomID}
+                    apiHost={this.state.apiHost}
+                />
+                <AddVideo
+                    key="form"
+                    socket={this.state.socket}
+                    userID={this.state.userID}
+                    roomID={this.state.roomID}
+                    apiHost={this.state.apiHost}
+                    ref={this._addVideoComponent}/>
+            </div>
         ];
     }
 }

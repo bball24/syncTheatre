@@ -4,6 +4,7 @@
 
 import React from 'react';
 import axios from 'axios';
+import Button from 'react-bootstrap/Button';
 import "./AddVideo.scss"
 
 export default class AddVideo extends React.Component {
@@ -14,7 +15,8 @@ export default class AddVideo extends React.Component {
             youtubeURL : "",
             userID : props.userID,
             roomID : props.roomID,
-            apiHost : props.apiHost
+            apiHost : props.apiHost,
+            currentVid : null
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -48,15 +50,33 @@ export default class AddVideo extends React.Component {
         })
     }
 
+    setCurrentVideo(vid){
+        this.setState({
+            currentVid : vid
+        });
+    }
+
     render(){
+
         return(
-            <form className='addVideo' onSubmit={this.handleSubmit}>
-                <label>
-                Add Video
-                    <input type="text" value={this.state.youtubeURL} onChange={this.handleChange}/>
-                </label>
-                <input type="submit" value="Add" />
-            </form>
+            <div className="addVideoWrap">
+                {this.state.currentVid && <div className="videoInfoWrap">
+                    <span className='videoInfoLabel'>Now Playing</span>
+                    <img className='videoInfoImg' src={this.state.currentVid.thumb.url}/>
+                    <span className='videoInfoTitle'> {this.state.currentVid.title}</span>
+                    <span className='videoInfoLength'> {this.state.currentVid.length}</span>
+                </div>}
+                <div className="addVideoInnerWrap">
+                    <span className='videoInfoLabel'>Add A Video</span>
+                    <div className="inputWrap">
+                        <input type="text" value={this.state.youtubeURL} onChange={this.handleChange} placeholder=' Enter a youtube URL'/>
+                    </div>
+                    <div className="buttonWrap">
+                        <Button variant="primary" onClick={this.handleSubmit}>Add</Button>
+                    </div>
+                </div>
+            </div>
+
         )
     }
 }

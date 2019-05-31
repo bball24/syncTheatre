@@ -4,6 +4,8 @@
 
 import React from 'react';
 import "./SendChatMessage.scss"
+import { FaCommentAlt } from "react-icons/fa";
+
 export default class SendChatMessage extends React.Component {
     constructor(props){
         super(props);
@@ -51,11 +53,8 @@ export default class SendChatMessage extends React.Component {
      */
     render(){
         return(
-            <form onSubmit={this.handleSubmit}>
-                <label className="chatInput">
-                    Send Message:
-                    <input type="text" value={this.state.message} onChange={this.handleChange} placeholder="Type Here"/>
-                </label>
+            <form className="sendForm" onSubmit={this.handleSubmit}>
+                    <input className="sendInput" type="text" value={this.state.message} onChange={this.handleChange} placeholder="Type Here"/>
             </form>
         )
     }

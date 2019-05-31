@@ -1,5 +1,12 @@
 
+body {
+  background: #1f1f21;
+}
 
+.Appcontainer {
+  background: #1f1f21;
+  color: #ccc;
+}
 .App .navbar-brand {
   font-weight: bold;
 }
@@ -7,6 +14,23 @@
     text-align: center;
 }
 .navbar{
-  background: red;
-  border-color: red;
+  background: #252525;
+  border-radius: 0px;
+  border: none;
+}
+
+.navbar-default .navbar-nav>li>a {
+  color: #ccc;
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+  color: #82b3fd;;
+}
+
+.navbar-default .navbar-brand {
+  color: #ccc;
+}
+
+.navbar-default .navbar-brand:hover {
+  color: #82b3fd;;
 }

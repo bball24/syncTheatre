@@ -156,12 +156,15 @@ export default class SyncLib {
         this.player.seekTo(time);
     }
 
-    loadVideo(video, queue, room){
+    loadVideo(video, queue, room, addVideo){
         room.setState({
             videoID : video.videoID
         });
         this.socketLog('[loadVideo] loading video:' + video);
         queue.current.updateQueue();
+        if(addVideo){
+            addVideo.current.setCurrentVideo(video)
+        }
         if(video && video.videoID !== ""){
             this.socketLog(video);
             this.player.loadVideoById(video.videoID, 0, "default");
