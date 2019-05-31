@@ -63,8 +63,10 @@ export default class AddVideo extends React.Component {
                 {this.state.currentVid && <div className="videoInfoWrap">
                     <span className='videoInfoLabel'>Now Playing</span>
                     <img className='videoInfoImg' src={this.state.currentVid.thumb.url}/>
-                    <span className='videoInfoTitle'> {this.state.currentVid.title}</span>
-                    <span className='videoInfoLength'> {this.state.currentVid.length}</span>
+                    <div className='videoInfoDetails'>
+                        <span className='videoInfoTitle'> {this.state.currentVid.title}</span>
+                        <span className='videoInfoLink'> <a href={ 'https://www.youtube.com/watch?v=' + this.state.currentVid.videoID}>Watch on Youtube.com</a></span>
+                    </div>
                 </div>}
                 <div className="addVideoInnerWrap">
                     <span className='videoInfoLabel'>Add A Video</span>

@@ -158,6 +158,7 @@ export default class Room extends React.Component {
                     userID={this.state.userID}
                     roomID={this.state.roomID}
                     apiHost={this.state.apiHost}
+                    socket={this.state.socket}
                 />
                 <AddVideo
                     key="form"

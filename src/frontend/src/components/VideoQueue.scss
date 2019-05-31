@@ -27,7 +27,7 @@
 .vid{
   font-size: 10px;
   background: #434343;
-  width: 10%;
+  width: 14em;
   height: 12em;
   margin-right: 5px;
   box-shadow: 0px 0px 3px #222222;
@@ -107,4 +107,32 @@
 
 ::-webkit-scrollbar-thumb {
   background: #797d8c;
+}
+
+.vidControl { display:none; }
+
+.vid:hover .vidControl{
+  display: block;
+  z-index: 1;
+  height: 12em;
+  width: 14em;
+  margin: 0;
+  position: fixed;
+}
+
+.vidControlIcons{
+  margin-top: 0em;
+  padding: 3em .75em;
+  height: 8em;
+  background-color: #000000c9;
+  cursor: pointer;
+}
+
+
+.ctrlIcons{
+  margin-right:2em;
+}
+
+.ctrlIcons:hover{
+  color:#337ab7;
 }
