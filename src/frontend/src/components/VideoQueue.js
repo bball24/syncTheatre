@@ -9,6 +9,7 @@
 import React from 'react';
 import axios from 'axios';
 import "./VideoQueue.scss";
+import { FaPlusSquare } from "react-icons/fa";
 
 export default class VideoQueue extends React.Component {
     constructor(props){
@@ -59,6 +60,7 @@ export default class VideoQueue extends React.Component {
     render(){
         return(
             <div className="VideoQueue">
+                <div className="addVideoBlock"><FaPlusSquare className="addVideoIcon" size={40}/></div>
                     {this.renderVids()}
             </div>
         )

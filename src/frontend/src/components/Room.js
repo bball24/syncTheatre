@@ -32,7 +32,8 @@ export default class Room extends React.Component {
         console.log({Page: 'Room', roomID: roomID, userID: userID});
 
         // connect to web socket
-        const socketURL = 'http://localhost:3001/rooms';
+        const socketURL = this.props.apiHost + '/rooms';
+        //const socketURL = 'http://localhost:3001/rooms';
         const socket = openSocket(socketURL);
         const lib = new SyncLib(roomID, userID, socket);
 
