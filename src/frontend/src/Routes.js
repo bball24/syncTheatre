@@ -23,7 +23,10 @@ export default class Routes extends React.Component {
             <Route path="/" exact component={Home} />
             <Route path='/signup' exact component={Signup}/>
             <Route path='/login' exact component={Login} />
-            <Route path='/profile' exact component={Profile}/>
+            <Route path='/profile/:userID'
+                   exact
+                   render={(props) => <Profile {...props}
+                                                 apiHost={this.state.apiHost} />}/>
             <Route path="/token/"
                    exact
                    render={(props) => <UserToken {...props}

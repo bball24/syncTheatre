@@ -9,18 +9,18 @@ export default class Profile extends Component {
         super(props);
         const values = queryString.parse(this.props.location.search);
         this.state = {
-            userID : values.uid,
+            userID : this.props.match.params.userID,
             apiHost : this.props.apiHost,
             roomName : "",
             photo : "",
             userName : "",
             badName : false
         };
-        axios.get(this.state.apiHost + '/api/users/ ' + this.state.userID)
-            .then((user) => {
-                console.log(user.data.userName);
-            })
-            .catch((err)=>{
+        axios.get(this.state.apiHost + '/api/users/' + this.state.userID)
+        .then((user) => {
+            console.log(user.data.userName);
+        })
+        .catch((err)=>{
             console.error(err);
         })
 

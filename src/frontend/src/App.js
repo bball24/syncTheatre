@@ -56,7 +56,7 @@ class App extends Component {
     renderUserAccountNav(){
         this.logInCheck();
         if(this.state.loggedIn){
-            return <NavItem href='/profile'><FaIdCard/> Profile</NavItem>
+            return( <NavItem href={'/profile/' + this.state.userID}><FaIdCard/> Profile</NavItem>);
         }
         else{
             return <NavItem href="/signup"><FaUser/> Signup</NavItem>
