@@ -6,6 +6,7 @@ import Routes from "./Routes";
 import { FaHome } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
+import {FaIdCard} from "react-icons/fa";
 
 import axios from "axios"
 
@@ -56,6 +57,7 @@ class App extends Component {
                             <Nav pullRight>
                                 <NavItem href="/signup"><FaUser/> Signup</NavItem>
                                 <NavItem href='/room'><FaYoutube/> Room</NavItem>
+                                <NavItem href='/profile'><FaIdCard/> Profile</NavItem>
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
