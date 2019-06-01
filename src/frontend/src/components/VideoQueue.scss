@@ -33,6 +33,7 @@
   margin-top: 2em;
   display:inline-block;
   min-width: 120px;
+  position:relative;
 }
 
 .vid:hover{
@@ -96,7 +97,7 @@
 
 /* Scroll Bar Stying */
 ::-webkit-scrollbar{
-  width:0px;
+  width:1em;
   height:1em;
 }
 
@@ -111,12 +112,13 @@
 .vidControl { display:none; }
 
 .vid:hover .vidControl{
-  display: block;
+  display: inline-block;
   z-index: 1;
   height: 12em;
   width: 14em;
   margin: 0;
-  position: fixed;
+  position: absolute;
+  margin-right: 5px;
 }
 
 .vidControlIcons{

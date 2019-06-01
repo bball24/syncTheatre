@@ -13,7 +13,7 @@ router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
     {
         res.redirect('http://localhost:3000/token/?s=false')
     }
-    
+
     //check if user is already in database
     //if he is, redirect to log-in page
     const user = new UserModel(false);
