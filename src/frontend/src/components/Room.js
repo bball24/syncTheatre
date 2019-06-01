@@ -8,6 +8,8 @@ import ChatBox from './ChatBox';
 import "./Room.scss"
 import "./Home.scss"
 import axios from "axios"
+import Button from "react-bootstrap/Button";
+let theatreMode = 0;
 
 // https://youtu.be/dQw4w9WgXcQ
 
@@ -139,6 +141,9 @@ export default class Room extends React.Component {
                         onEnd={this.state.lib.onEnd}
                         onError={this.state.lib.onError}
                     />
+                </div>
+                <div className="buttonWrap">
+                    <Button variant="primary" onClick={"nothing"}>Theatre Mode</Button>
                 </div>
                 <ChatBox
                     className="ChatBox"
