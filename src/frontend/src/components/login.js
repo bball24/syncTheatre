@@ -12,11 +12,15 @@ export default class Login extends Component {
         const values = queryString.parse(this.props.location.search);
         this.state = {
             token : values.tok || "",
-            userID : values.uid
+            userID : values.uid,
+            updateFn : this.props.updateFn
         };
 
         sessionStorage.setItem('SyncTheatre:userID', JSON.stringify(this.state.userID));
         sessionStorage.setItem('SyncTheatre:token', JSON.stringify(this.state.token));
+
+        //tell the Root App component to update its userIDs.
+        this.state.updateFn();
     };
 
 

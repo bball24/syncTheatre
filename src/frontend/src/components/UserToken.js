@@ -30,7 +30,8 @@ export default class UserToken extends Component {
             user : {},
             roomName : "",
             userName : "",
-            badName : false
+            badName : false,
+            updateFn : this.props.updateFn
         };
 
     }
@@ -71,6 +72,11 @@ export default class UserToken extends Component {
         .then((user) => {
             sessionStorage.setItem('SyncTheatre:userID', JSON.stringify(user.data.userID));
             sessionStorage.setItem('SyncTheatre:token', JSON.stringify(this.state.token));
+
+            //tell the root App component to update userIDs
+            this.state.updateFn();
+
+            //redirect to App component
             this.setState({
                 redirect : true
             });

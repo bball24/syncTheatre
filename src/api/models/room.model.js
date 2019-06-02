@@ -210,10 +210,10 @@ class Room {
                     let isPartyLeader = false;
                     let isFounder = false;
 
-                    if(user.userID === this.partyLeaderID){
+                    if(user.userID == this.partyLeaderID){
                         isPartyLeader = true;
                     }
-                    if(user.userID === this.founderID){
+                    if(user.userID == this.founderID){
                         isFounder = true;
                     }
 

@@ -17,12 +17,16 @@ class App extends Component {
         const host = 'http://192.168.33.129:3001';
         //const host = 'http://localhost:3001';
 
+        this.componentDidMount = this.componentDidMount.bind(this);
+        this.updateUserIDs = this.updateUserIDs.bind(this);
+
 
         this.state = {
             apiHost : host,
             userID : JSON.parse(sessionStorage.getItem('SyncTheatre:userID')) || -1,
-            loggedIn : false
-    };
+            loggedIn : false,
+            updated : false
+        };
 
         if(this.state.userID === -1){
             axios.post(this.state.apiHost + '/api/users/temp')
@@ -63,9 +67,26 @@ class App extends Component {
         }
     }
 
+    updateUserIDs(){
+        //re-update userIDs
+        let userID = JSON.parse(sessionStorage.getItem('SyncTheatre:userID')) || -1;
+        let tok = JSON.parse(sessionStorage.getItem('SyncTheatre:token')) || -1;
+
+        this.setState({
+            userID : userID,
+            userTok: tok
+        });
+
+        this.setState({updated : true});
+    }
+
+    componentDidMount(){
+        this.updateUserIDs();
+    }
+
     render() {
         //wait for userID from API
-        if(this.state.userID === -1){
+        if(this.state.userID === -1 || !this.state.updated){
             return (<h3>Loading, Please Wait.</h3>)
         }
         else{
@@ -85,7 +106,7 @@ class App extends Component {
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
-                    <Routes userID={this.state.userID} apiHost={this.state.apiHost}/>
+                    <Routes updateFn={this.updateUserIDs} userID={this.state.userID} apiHost={this.state.apiHost}/>
                 </div>
             );
         }

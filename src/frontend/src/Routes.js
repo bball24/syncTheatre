@@ -14,7 +14,8 @@ export default class Routes extends React.Component {
         super(props);
         this.state = {
             apiHost : props.apiHost,
-            userID : props.userID
+            userID : props.userID,
+            updateFn : props.updateFn
         };
     }
 
@@ -22,7 +23,10 @@ export default class Routes extends React.Component {
         return (<Switch>
             <Route path="/" exact component={Home} />
             <Route path='/signup' exact component={Signup}/>
-            <Route path='/login' exact component={Login} />
+
+            <Route path='/login' exact
+                   render={(props) => <Login {...props}  updateFn={this.state.updateFn}/>}/>
+
             <Route path='/profile/:userID'
                    exact
                    render={(props) => <Profile {...props}
@@ -30,6 +34,7 @@ export default class Routes extends React.Component {
             <Route path="/token/"
                    exact
                    render={(props) => <UserToken {...props}
+                                                 updateFn={this.state.updateFn}
                                                  apiHost={this.state.apiHost}/>}/>
             <Route
                 exact
