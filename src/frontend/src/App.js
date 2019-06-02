@@ -14,8 +14,8 @@ import axios from "axios"
 class App extends Component {
     constructor(props){
         super(props);
-        const host = 'http://192.168.33.129:3001';
-        //const host = 'http://localhost:3001';
+        //const host = 'http://192.168.33.129:3001';
+        const host = 'http://localhost:3001';
 
 
         this.state = {
