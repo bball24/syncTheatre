@@ -38,8 +38,15 @@ export default class ChatBox extends React.Component {
         this.renderUsers = this.renderUsers.bind(this);
         this.updateUserList = this.updateUserList.bind(this);
         this.changePartyLeaderTo = this.changePartyLeaderTo.bind(this);
+        this.toggleTheatreMode = this.toggleTheatreMode.bind(this);
         this.renderMessages();
         this.updateUserList()
+    }
+
+    toggleTheatreMode(){
+        this.setState({
+            theatreMode : !this.state.theatreMode
+        })
     }
 
     /**
@@ -173,7 +180,7 @@ export default class ChatBox extends React.Component {
 
         if(this.state.theatreMode){
             return[
-                <Tabs className='chatboxTheatreMode'>
+                <Tabs style={{ width: '100%' }}>
                     <TabList>
                         <Tab>Users</Tab>
                         <Tab>Chat</Tab>
@@ -209,7 +216,7 @@ export default class ChatBox extends React.Component {
         }
         else{
             return[
-                <Tabs style={{ width: '100%' }}>
+                <Tabs>
                     <TabList>
                         <Tab>Users</Tab>
                         <Tab>Chat</Tab>

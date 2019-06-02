@@ -96,6 +96,9 @@ export default class Room extends React.Component {
         this.setState({
             theatreMode : !this.state.theatreMode
         })
+        if(this._chatBox){
+            this._chatBox.current.toggleTheatreMode();
+        }
     };
 
 
