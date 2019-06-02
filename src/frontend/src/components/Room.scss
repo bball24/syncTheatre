@@ -13,8 +13,13 @@
 
 .YTWrapperTheatreMode div{
   float: left;
-  width:70%;
+  width:100%;
   height:70vh;
+}
+
+.YTWrapperTheatreMode iframe{
+  width: 100%;
+  height:100%;
 }
 
 .YTWrapper iframe{
