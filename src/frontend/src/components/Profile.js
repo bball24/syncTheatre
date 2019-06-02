@@ -3,6 +3,7 @@ import "./Profile.scss"
 import axios from 'axios';
 import queryString from 'query-string';
 import Button from 'react-bootstrap/Button';
+import { Redirect } from 'react-router-dom'
 
 export default class Profile extends Component {
     constructor(props) {
@@ -10,10 +11,12 @@ export default class Profile extends Component {
         this.state = {
             userID : this.props.match.params.userID,
             apiHost : this.props.apiHost,
-            roomName : "",
+            redirect: false,
             photo : "",
             userName : "",
             badName : false
+
+
         };
 
 
@@ -25,16 +28,24 @@ export default class Profile extends Component {
             console.log(user.data.userName);
             console.log(user.data.userID);
         })
-        .catch((err)=>{
-            console.error(err);
-        })
+            .catch((err)=>{
+                console.error(err);
+            })
 
-        this.handleSubmit = this.handleSubmit.bind(this);
 
     }
 
-    handleSubmit(event){
 
+    setRedirect = () => {
+        this.setState({
+            redirect: true
+        })
+    }
+
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            return <Redirect to='/target' />
+        }
     }
 
     render() {
@@ -46,7 +57,8 @@ export default class Profile extends Component {
                         <img className="profilePic" src={this.state.photo}/>
                         <div className='username'>Current UserName: {this.state.userName}</div>
                         <div className='button'>
-                            <Button variant="primary" block size="lg"onClick={this.handleSubmit}>Change UserName</Button>
+                             {this.renderRedirect()}
+                            <Button variant="primary" block size="lg" onClick={this.setRedirect}>Change UserName</Button>
                         </div>
                     </span>
                 </div>
