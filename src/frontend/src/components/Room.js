@@ -9,7 +9,6 @@ import "./Room.scss"
 import "./Home.scss"
 import axios from "axios"
 import Button from "react-bootstrap/Button";
-let theatreMode = 0;
 
 // https://youtu.be/dQw4w9WgXcQ
 
@@ -60,6 +59,7 @@ export default class Room extends React.Component {
         lib.chatMessage = lib.chatMessage.bind(lib);
         lib.updateUsers = lib.updateUsers.bind(lib);
         this.videoReady = this.videoReady.bind(this);
+        this.toggleTheatreMode = this.toggleTheatreMode.bind(this);
 
         //socket even handlers
         socket.on('connect', () => {lib.connect()});
@@ -86,10 +86,17 @@ export default class Room extends React.Component {
             player : null,
             apiHost : this.props.apiHost,
             partyLeaderID: -1,
-            founderID: -1
+            founderID: -1,
+            theatreMode: false
         };
-
     }
+
+    toggleTheatreMode(){
+        this.setState({
+            theatreMode : !this.state.theatreMode
+        })
+    };
+
 
     videoReady(event) {
         // access to player in all event handlers via event.target
@@ -127,52 +134,108 @@ export default class Room extends React.Component {
             playerVars: playerVars
         };
 
-        return [
-            <div className="Room" key="wrapper">
-                <div className="YTWrapper">
-                    <YouTube
-                        className="YTWrapper"
-                        key="video"
-                        videoId={this.state.videoID}
-                        opts={opts}
-                        onReady={this.videoReady}
-                        onPlay={this.state.lib.onPlay}
-                        onPause={this.state.lib.onPause}
-                        onEnd={this.state.lib.onEnd}
-                        onError={this.state.lib.onError}
+        if(!this.state.theatreMode)
+        {
+            return [
+                <div className="Room" key="wrapper">
+                    <div className="YTWrapper">
+                        <YouTube
+                            className="YTWrapper"
+                            key="video"
+                            videoId={this.state.videoID}
+                            opts={opts}
+                            onReady={this.videoReady}
+                            onPlay={this.state.lib.onPlay}
+                            onPause={this.state.lib.onPause}
+                            onEnd={this.state.lib.onEnd}
+                            onError={this.state.lib.onError}
+                        />
+                    </div>
+                    <div className="buttonWrap">
+                        <Button variant="primary" onClick={this.toggleTheatreMode}>Theatre Mode</Button>
+                    </div>
+                    <ChatBox
+                        className="ChatBox"
+                        key="chat"
+                        ref={this._chatBox}
+                        apiHost = {this.state.apiHost}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        socket={this.state.socket}
+                        partyLeaderID={this.state.partyLeaderID}
+                        founderID={this.state.founderID}
+                    />
+                    <VideoQueue
+                        className="VideoQueue"
+                        key="queue"
+                        ref={this._videoQueueComponent}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        apiHost={this.state.apiHost}
+                        socket={this.state.socket}
+                    />
+                    <AddVideo
+                        key="form"
+                        socket={this.state.socket}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        apiHost={this.state.apiHost}
+                        ref={this._addVideoComponent}/>
+                </div>
+            ];
+        }
+        else
+        {
+            return [
+                <div className="Room" key="wrapper">
+                    <div className="YTWrapper">
+                        <YouTube
+                            className="YTWrapper"
+                            key="video"
+                            videoId={this.state.videoID}
+                            opts={opts}
+                            onReady={this.videoReady}
+                            onPlay={this.state.lib.onPlay}
+                            onPause={this.state.lib.onPause}
+                            onEnd={this.state.lib.onEnd}
+                            onError={this.state.lib.onError}
+                        />
+                    </div>
+                    <div className="buttonWrap">
+                        <Button variant="primary" onClick={this.toggleTheatreMode}>Theatre Mode</Button>
+                    </div>
+                    <VideoQueue
+                        className="VideoQueue"
+                        key="queue"
+                        ref={this._videoQueueComponent}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        apiHost={this.state.apiHost}
+                        socket={this.state.socket}
+                    />
+                    <AddVideo
+                        key="form"
+                        socket={this.state.socket}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        apiHost={this.state.apiHost}
+                        ref={this._addVideoComponent}
+                    />
+                    <ChatBox
+                        className="ChatBox"
+                        key="chat"
+                        ref={this._chatBox}
+                        apiHost = {this.state.apiHost}
+                        userID={this.state.userID}
+                        roomID={this.state.roomID}
+                        socket={this.state.socket}
+                        partyLeaderID={this.state.partyLeaderID}
+                        founderID={this.state.founderID}
                     />
                 </div>
-                <div className="buttonWrap">
-                    <Button variant="primary" onClick={"nothing"}>Theatre Mode</Button>
-                </div>
-                <ChatBox
-                    className="ChatBox"
-                    key="chat"
-                    ref={this._chatBox}
-                    apiHost = {this.state.apiHost}
-                    userID={this.state.userID}
-                    roomID={this.state.roomID}
-                    socket={this.state.socket}
-                    partyLeaderID={this.state.partyLeaderID}
-                    founderID={this.state.founderID}
-                />
-                <VideoQueue
-                    className="VideoQueue"
-                    key="queue"
-                    ref={this._videoQueueComponent}
-                    userID={this.state.userID}
-                    roomID={this.state.roomID}
-                    apiHost={this.state.apiHost}
-                    socket={this.state.socket}
-                />
-                <AddVideo
-                    key="form"
-                    socket={this.state.socket}
-                    userID={this.state.userID}
-                    roomID={this.state.roomID}
-                    apiHost={this.state.apiHost}
-                    ref={this._addVideoComponent}/>
-            </div>
-        ];
+
+            ]
+        }
+
     }
 }
