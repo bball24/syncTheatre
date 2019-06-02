@@ -75,6 +75,7 @@ export default class Profile extends Component {
                     <span className="profile">
                         <img className="profilePic" src={this.state.photo}/>
                         <div className='username'>Current UserName: {this.state.userName}</div>
+                        <div className='yourRoom'>Your Permanent Room: <a href={'/user/' + this.state.userName}>room link</a></div>
                         <div className='button'>
                             <Button variant="primary" block size="lg"
                                     onClick={this.handleSubmit}>Change UserName</Button>
@@ -92,6 +93,7 @@ export default class Profile extends Component {
                         <span className="profile">
                         <img className="profilePic" src={this.state.photo}/>
                         <div className='username'>Current UserName: {this.state.userName}</div>
+                        <div className='yourRoom'>Your Permanent Room: <a href={'/user/' + this.state.userName}>room link</a></div>
                         <div className='button'>
                             <Button variant="primary" block size="lg"
                                     onClick={this.handleClick}>UserName</Button>

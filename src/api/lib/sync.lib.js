@@ -4,7 +4,7 @@
 const RoomModelFactory = require('../models/room.model').RoomModelFactory;
 const UserModel = require('../models/user.model');
 
-const DEBUG_OUTPUT = true;
+const DEBUG_OUTPUT = false;
 const socketLog = (output) => {
     if(DEBUG_OUTPUT){
         console.log("--->[WS] :: " + output);
@@ -125,8 +125,7 @@ module.exports = {
                 client.to(getRoomName(roomID)).broadcast.emit('playVideo');
                 RoomModelFactory.updateRoom(roomID, { roomStatus: 'PLAYING'})
                 .then((room) => {
-                    console.log("room updated to PLAYING");
-                    console.log(room);
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -148,8 +147,6 @@ module.exports = {
 
                 RoomModelFactory.updateRoom(roomID, { roomStatus: 'PAUSED'})
                 .then((room) => {
-                    console.log("room updated to PAUSED");
-                    console.log(room);
                 })
                 .catch((err) => {
                     console.error(err);
