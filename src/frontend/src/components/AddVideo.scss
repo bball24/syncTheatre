@@ -5,12 +5,15 @@
   background-color: #292b2e;
   font-size: 10px;
   border-top: 1px dotted #37393c;
+  display: table;
+  padding-left: 1%;
+  padding-top: 1em;
 }
 
 .addVideoInnerWrap{
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
-  margin-top: 1em;
+  display: table-row;
 }
 
 .inputWrap{
@@ -41,18 +44,30 @@
 }
 
 /** Video Info **/
+
+.videoInfoDetails{
+  float: left;
+  height: 6em;
+  width: 82%;
+  margin-left: 3%;
+}
+
 .videoInfoImg{
-  width:7em;
+  width:15%;
+  height : 6em;
+  float:left;
 }
 
 .videoInfoTitle{
-  margin-left:2em;
+  width: 100%;
+  float: left;
+  margin-bottom:1em;
 }
 
 .videoInfoWrap{
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
-  margin-top: 1em;
+  display: table-row;
 }
 
 .videoInfoLabel{

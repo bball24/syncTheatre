@@ -9,7 +9,6 @@
   font-size: 10px;
   display: inline-block;
   white-space: nowrap;
-  overflow-x: scroll;
   overflow-y: hidden;
   float:left;
 }
@@ -17,6 +16,8 @@
 .VideoQueue img{
   display:block;
   margin: 0 auto;
+  width:120px;
+  height:90px;
 }
 .VideoQueue ul{
   padding: 0px;
@@ -34,6 +35,7 @@
   margin-top: 2em;
   display:inline-block;
   min-width: 120px;
+  position:relative;
 }
 
 .vid:hover{
@@ -97,7 +99,7 @@
 
 /* Scroll Bar Stying */
 ::-webkit-scrollbar{
-  width:0px;
+  width:1em;
   height:1em;
 }
 
@@ -112,27 +114,53 @@
 .vidControl { display:none; }
 
 .vid:hover .vidControl{
-  display: block;
+  display: inline-block;
   z-index: 1;
   height: 12em;
   width: 14em;
   margin: 0;
-  position: fixed;
+  position: absolute;
+  margin-right: 5px;
 }
 
 .vidControlIcons{
-  margin-top: 0em;
-  padding: 3em .75em;
-  height: 8em;
   background-color: #000000c9;
-  cursor: pointer;
+  display: table;
+  margin: 0 auto;
+  width: 120px;
+  height: 90px;
 }
 
 
 .ctrlIcons{
-  margin-right:2em;
+  margin: 0em .5em;
+  margin-top: 1.5em;
 }
 
 .ctrlIcons:hover{
   color:#337ab7;
+  cursor: pointer;
+}
+
+.deleteWrapper{
+  height: 2em;
+  float: left;
+  width: 100%;
+  margin-top: .5em;
+  margin-right: .5em;
+}
+
+.ctrlWrapper{
+  height: 6em;
+  width: 100%;
+  float: left;
+}
+
+.trashIcon{
+  float:right;
+}
+
+.trashIcon:hover{
+  color: #b73333;
+  cursor: pointer;
 }

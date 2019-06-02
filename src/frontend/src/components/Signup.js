@@ -48,9 +48,9 @@ export default class Signup extends Component {
                 <div className="outerWrap">
                     <div className="innerWrap">
                         <h2>You are already signed in!</h2>
-                        <span className="introText">
+                        <p className="introMessage">
                             Start watching videos with your friends!
-                        </span>
+                        </p>
                     </div>
                 </div>
             );
@@ -60,7 +60,7 @@ export default class Signup extends Component {
                 <div className="outerWrap">
                     <div className="innerWrap">
                         <h2>Create Account and Sign In</h2>
-                        <span className="introText">
+                        <span className="introMessage">
                         You can create an account by signing in with google.
                         To log-in to your account, sign-in again. Registered users
                         get their own private permanent room and a custom user name!

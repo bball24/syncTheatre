@@ -24,7 +24,13 @@ router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
     })
     .catch((notFound) => {
         console.error(notFound);
-        user.registerUser(req.user.id, req.user.id, req.user.provider);
+
+        let photo = "";
+        if(req.user.photos && req.user.photos.length > 0 && req.user.photos[0].value){
+            photo = req.user.photos[0].value
+        }
+
+        user.registerUser(req.user.id, req.user.id, req.user.provider, photo);
         user.createRegisteredUser().then((doc) => {
             res.redirect('http://localhost:3000/token/?tok=' + req.user.token + '&s=true&uid=' + user.userID )
         })

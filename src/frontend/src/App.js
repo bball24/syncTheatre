@@ -6,6 +6,7 @@ import Routes from "./Routes";
 import { FaHome } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
+import {FaIdCard} from "react-icons/fa";
 
 import axios from "axios"
 
@@ -19,8 +20,9 @@ class App extends Component {
 
         this.state = {
             apiHost : host,
-            userID : JSON.parse(sessionStorage.getItem('SyncTheatre:userID')) || -1
-        };
+            userID : JSON.parse(sessionStorage.getItem('SyncTheatre:userID')) || -1,
+            loggedIn : false
+    };
 
         if(this.state.userID === -1){
             axios.post(this.state.apiHost + '/api/users/temp')
@@ -34,6 +36,30 @@ class App extends Component {
             .catch((err) => {
                 console.error(err);
             });
+        }
+    }
+
+    logInCheck(){
+        let userID = JSON.parse(sessionStorage.getItem('SyncTheatre:userID')) || -1;
+        let tok = JSON.parse(sessionStorage.getItem('SyncTheatre:token')) || -1;
+
+        //if the user has a valid token, they are signed in
+        //as a registered user
+        if(tok === -1){
+            this.state.loggedIn = false;
+        }
+        else{
+            this.state.loggedIn = true;
+        }
+    }
+
+    renderUserAccountNav(){
+        this.logInCheck();
+        if(this.state.loggedIn){
+            return( <NavItem href={'/profile/' + this.state.userID}><FaIdCard/> Profile</NavItem>);
+        }
+        else{
+            return <NavItem href="/signup"><FaUser/> Signup</NavItem>
         }
     }
 
@@ -54,7 +80,7 @@ class App extends Component {
                         </Navbar.Header>
                         <Navbar.Collapse>
                             <Nav pullRight>
-                                <NavItem href="/signup"><FaUser/> Signup</NavItem>
+                                {this.renderUserAccountNav()}
                                 <NavItem href='/room'><FaYoutube/> Room</NavItem>
                             </Nav>
                         </Navbar.Collapse>

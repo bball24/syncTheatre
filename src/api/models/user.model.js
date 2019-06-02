@@ -12,15 +12,17 @@ class User {
         this.isGuest = isGuest;
         this.oauthID = "";
         this.oauthURL = "";
+        this.photo = "";
 
         this.db = mongoUtil.getConnection();
     }
 
-    registerUser(userName, oauthID, oauthURL){
+    registerUser(userName, oauthID, oauthURL, photo){
         this.userName = userName;
         this.roomName = this.userName;
         this.oauthID = oauthID;
         this.oauthURL = oauthURL;
+        this.photo = photo;
 
     }
 
@@ -67,7 +69,8 @@ class User {
             isGuest : this.isGuest,
             createdAt : this.createdAt,
             oauthID : this.oauthID,
-            oauthURL : this.oauthURL
+            oauthURL : this.oauthURL,
+            photo : this.photo
         }
     }
 
@@ -81,6 +84,7 @@ class User {
         this.createdAt = doc.createdAt;
         this.oauthID = doc.oauthID;
         this.oauthURL = doc.oauthURL;
+        this.photo = doc.photo;
     }
 
     createGuestUser(){
