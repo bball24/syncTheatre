@@ -11,6 +11,12 @@
   height:70vh;
 }
 
+.YTWrapperTheatreMode div{
+  float: left;
+  width:70%;
+  height:70vh;
+}
+
 .YTWrapper iframe{
   width: 100%;
   height:100%;
@@ -46,4 +52,10 @@
   background-color: #292b2e;
   height: 91%;
   padding: 0%;
+}
+
+.buttonWrapFloat {
+  position: absolute;
+  top: 10%;
+  right: 10%;
 }

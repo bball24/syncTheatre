@@ -151,7 +151,7 @@ export default class Room extends React.Component {
                             onError={this.state.lib.onError}
                         />
                     </div>
-                    <div className="buttonWrap">
+                    <div className="buttonWrapFloat">
                         <Button variant="primary" onClick={this.toggleTheatreMode}>Theatre Mode</Button>
                     </div>
                     <ChatBox
@@ -188,7 +188,7 @@ export default class Room extends React.Component {
         {
             return [
                 <div className="Room" key="wrapper">
-                    <div className="YTWrapper">
+                    <div className="YTWrapperTheatreMode">
                         <YouTube
                             className="YTWrapper"
                             key="video"
@@ -201,7 +201,7 @@ export default class Room extends React.Component {
                             onError={this.state.lib.onError}
                         />
                     </div>
-                    <div className="buttonWrap">
+                    <div className="buttonWrapFloat">
                         <Button variant="primary" onClick={this.toggleTheatreMode}>Theatre Mode</Button>
                     </div>
                     <VideoQueue
