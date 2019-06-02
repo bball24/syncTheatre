@@ -9,7 +9,7 @@
 import React from 'react';
 import axios from 'axios';
 import "./VideoQueue.scss";
-import { FaPlayCircle, FaCaretSquareLeft, FaCaretSquareRight } from "react-icons/fa";
+import { FaPlayCircle, FaCaretSquareLeft, FaCaretSquareRight, FaTimesCircle} from "react-icons/fa";
 
 export default class VideoQueue extends React.Component {
     constructor(props){
@@ -28,6 +28,7 @@ export default class VideoQueue extends React.Component {
         this.shiftLeft = this.shiftLeft.bind(this);
         this.playVideo = this.playVideo.bind(this);
         this.shiftRight = this.shiftRight.bind(this);
+        this.deleteVid = this.deleteVid.bind(this);
         this.updateQueue();
     }
 
@@ -76,30 +77,49 @@ export default class VideoQueue extends React.Component {
     }
 
     shiftLeft(i){
-        if(i > 0 && i < this.state.videoQueue.length){
+        if(i > 0 && i <= this.state.videoQueue.length){
             this.swapVids(i-1, i);
         }
 
         axios.put(this.state.apiHost + '/api/rooms/' + this.state.roomID, {videoQueue: this.state.videoQueue})
         .then((queue) => {
-            this.updateQueue();
+            this.state.socket.emit('updateQueue', this.state.roomID, this.state.userID);
         })
         .catch((err) => {
             console.error(err);
         })
     }
     shiftRight(i){
-        if(i > 0 && (i + 1) < this.state.videoQueue.length){
+        if(i >= 0 && (i + 1) < this.state.videoQueue.length){
             this.swapVids(i, i+1);
         }
 
         axios.put(this.state.apiHost + '/api/rooms/' + this.state.roomID, {videoQueue: this.state.videoQueue})
-            .then((queue) => {
-                this.updateQueue();
-            })
-            .catch((err) => {
-                console.error(err);
-            })
+        .then((queue) => {
+            this.state.socket.emit('updateQueue', this.state.roomID, this.state.userID);
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    }
+
+    deleteVid(i){
+        let newVidQueue = []
+        let idx = 0;
+        this.state.videoQueue.forEach((vid) => {
+            if(idx != i){
+                newVidQueue.push(vid);
+            }
+            idx++;
+        })
+
+        axios.put(this.state.apiHost + '/api/rooms/' + this.state.roomID, {videoQueue: newVidQueue})
+        .then((queue) => {
+            this.state.socket.emit('updateQueue', this.state.roomID, this.state.userID);
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     }
 
     renderVids(){
@@ -109,9 +129,14 @@ export default class VideoQueue extends React.Component {
                 <div className='vid' key={i}>
                     <div className='vidControl'>
                         <div className='vidControlIcons'>
-                            <FaCaretSquareLeft className='ctrlIcons' onClick={()=>{this.shiftLeft(i)}}size={30}/>
-                            <FaPlayCircle className='ctrlIcons' size={30} onClick={()=>{this.playVideo(i)}}/>
-                            <FaCaretSquareRight className='ctrlIcons' size={30} onClick={()=>{this.shiftRight(i)}}/>
+                            <div className='deleteWrapper'>
+                                <span title='delete video'><FaTimesCircle className='trashIcon' size={15} onClick={()=>{this.deleteVid(i)}}/></span>
+                            </div>
+                            <div className='ctrlWrapper'>
+                                <span title='shift left'><FaCaretSquareLeft className='ctrlIcons' onClick={()=>{this.shiftLeft(i)}} size={30}/></span>
+                                <span title='play now'><FaPlayCircle className='ctrlIcons' size={30} onClick={()=>{this.playVideo(i)}}/></span>
+                                <span title='shift right'><FaCaretSquareRight className='ctrlIcons' size={30} onClick={()=>{this.shiftRight(i)}}/></span>
+                            </div>
                         </div>
                     </div>
                     <div className='vidQueueInfo'>

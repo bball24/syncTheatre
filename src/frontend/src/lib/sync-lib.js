@@ -113,6 +113,12 @@ export default class SyncLib {
 
     onError(err){
         console.error(err);
+        if(err.data == '150' || err.data == '101'){
+            console.log("The owner of this video has disabled embedded iFrame playback.");
+            if(this.socket && this.isPartyLead){
+                this.socket.emit('doneVideo', this.roomID, this.userID);
+            }
+        }
     }
 
     changeSpeed(speed){
