@@ -109,7 +109,6 @@ export default class Room extends React.Component {
         this.state.lib.onPlayerReady(event);
         this.state.lib.seekVideo(this.state.curTime)
         this.state.lib.playVideo();
-        console.log("it fired");
     }
 
     render() {
@@ -152,7 +151,7 @@ export default class Room extends React.Component {
                             onPlay={this.state.lib.onPlay}
                             onPause={this.state.lib.onPause}
                             onEnd={this.state.lib.onEnd}
-                            onError={this.state.lib.onError}
+                            onError={(err) => {this.state.lib.onError(err, this.state.videoID)}}
                         />
                         <span title='Toggle Theatre Mode'  className="buttonWrapFloat" onClick={this.toggleTheatreMode}>
                             <FaArrowsAltH className='theatreModeIcon'/>

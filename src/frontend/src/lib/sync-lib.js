@@ -48,7 +48,6 @@ export default class SyncLib {
             else{
                 status = 'PAUSED';
             }
-            console.log(status);
             this.socket.emit('sync', this.roomID, this.userID, this.player.getCurrentTime(), Date.now(), status);
         }
     };
@@ -98,8 +97,6 @@ export default class SyncLib {
                     this.pauseVideo();
                 }
             }
-            console.log("Client player: " + playerStatus)
-            console.log("Party Leader Player: " + status);
 
             this.socketLog('[syncTime] hostTime: ' + adjustedVideoTime + ' | clientTime: ' + clientTime + ' | syncDiff: ' + syncDiff);
         }
@@ -111,8 +108,9 @@ export default class SyncLib {
         this.startSync();
     }
 
-    onError(err){
+    onError(err, videoID){
         console.error(err);
+        console.error("[YOUTUBE ERR] :: videoID:" + videoID);
         if(err.data == '150' || err.data == '101'){
             console.log("The owner of this video has disabled embedded iFrame playback.");
             if(this.socket && this.isPartyLead){
@@ -173,6 +171,7 @@ export default class SyncLib {
         }
         if(video && video.videoID !== ""){
             this.socketLog(video);
+            console.log(video);
             this.player.loadVideoById(video.videoID, 0, "default");
         }
         else{

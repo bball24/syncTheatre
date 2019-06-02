@@ -62,7 +62,7 @@ class Video{
     getVideoDetails(){
         return new Promise((resolve, reject) => {
             const baseUrl = "https://www.googleapis.com/youtube/v3/videos";
-            const part = "?part=snippet";
+            const part = "?part=snippet,status";
             const videoID = "&id=" + this.videoID;
             const apiKey = "&key="+ this.youtubeAPIKey;
             const url = baseUrl + part + videoID + apiKey;
@@ -71,8 +71,9 @@ class Video{
                 const details = {
                     thumb : data.data.items[0].snippet.thumbnails.default,
                     title : data.data.items[0].snippet.title,
-                    videoID : this.videoID
-                }
+                    videoID : this.videoID,
+                    embeddable : data.data.items[0].status.embeddable
+                };
                 resolve(details);
             })
             .catch((err) => {

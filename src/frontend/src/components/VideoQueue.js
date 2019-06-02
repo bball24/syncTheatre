@@ -53,12 +53,10 @@ export default class VideoQueue extends React.Component {
     playVideo(i){
         console.log(i);
         if( i >= 0 && i <= this.state.videoQueue.length){
-            console.log(this.state.videoQueue[i]);
             this.swapVids(0, i)
             axios.put(this.state.apiHost + '/api/rooms/' + this.state.roomID, {videoQueue: this.state.videoQueue})
             .then((queue) => {
-                const url = this.state.apiHost + '/api/rooms/queue/' + this.state.roomID;
-                axios.get(url)
+                axios.get(this.state.apiHost + '/api/rooms/queue/' + this.state.roomID)
                 .then((queue) => {
                     this.setState({
                         videoQueue : queue.data.queue
