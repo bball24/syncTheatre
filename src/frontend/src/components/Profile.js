@@ -41,8 +41,21 @@ export default class Profile extends Component {
         this.setState({changeUserName: true})
     }
     handleClick(event){
-
         this.setState({changeUserName: false})
+        console.log(this.state.userName)
+        event.preventDefault();
+
+        const userInfo = {
+            userName : this.state.userName
+        }
+        axios.put(this.state.apiHost + '/api/users/' + this.state.userID, userInfo)
+            .then((user) => {
+                console.log(user.data.userName);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+
     }
     handleChange = event => {
         this.setState({
