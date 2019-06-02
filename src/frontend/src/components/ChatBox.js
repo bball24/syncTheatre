@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import ReactDom from 'react-dom'
 import "./VideoQueue.scss";
 import SendChatMessage from './SendChatMessage';
 import RoomUsers from "./RoomUsers";
@@ -80,9 +81,19 @@ export default class ChatBox extends React.Component {
         })
     }
 
+    isInViewport(offset = 0){
+        if (!this.tabsRef) return false;
+        const top = this.tabsRef.getBoundingClientRect().top;
+        console.log(top);
+        console.log(window.innerHeight);
+        return (top + offset) >= 0 && (top - offset) <= window.innerHeight;
+    }
+
     scrollToBottom = () => {
-        if(this.messagesEnd) {
-            this.messagesEnd.scrollIntoView({behavior: "smooth"});
+        if(this.isInViewport()){
+            if(this.messagesEnd){
+                this.messagesEnd.scrollIntoView({behavior: "smooth"});
+            }
         }
     }
 
@@ -180,6 +191,7 @@ export default class ChatBox extends React.Component {
 
         if(this.state.theatreMode){
             return[
+                <span ref={(el) => { this.tabsRef = el; }}></span>,
                 <Tabs style={{ width: '100%' }}>
                     <TabList>
                         <Tab>Users</Tab>
@@ -216,6 +228,7 @@ export default class ChatBox extends React.Component {
         }
         else{
             return[
+                <span ref={(el) => { this.tabsRef = el; }}></span>,
                 <Tabs>
                     <TabList>
                         <Tab>Users</Tab>
