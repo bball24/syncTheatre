@@ -26,7 +26,8 @@ export default class ChatBox extends React.Component {
             socket  : props.socket,
             apiHost : props.apiHost,
             partyLeaderID : props.partyLeaderID,
-            founderID : props.founderID
+            founderID : props.founderID,
+            theatreMode : props.theatreMode
         };
 
         this.state._userList = React.createRef();
@@ -169,40 +170,78 @@ export default class ChatBox extends React.Component {
      * @returns {[XML,XML]}
      */
     render(){
-        return[
 
-            <Tabs>
-                <TabList>
-                    <Tab>Users</Tab>
-                    <Tab>Chat</Tab>
-                </TabList>
+        if(this.state.theatreMode){
+            return[
+                <Tabs className='chatboxTheatreMode'>
+                    <TabList>
+                        <Tab>Users</Tab>
+                        <Tab>Chat</Tab>
+                    </TabList>
 
-                <TabPanel>
-                    <div className="UserList">
-                        <div>
-                            {this.renderUsers()}
-                        </div>
-                    </div>
-                </TabPanel>
-
-                <TabPanel>
-                    <div key="chatWrap" className="chatBox">
-                        <div className="chatList">
-                            {this.renderMessages()}
-                            <div style={{ float:"left", clear: "both" }}
-                                 ref={(el) => { this.messagesEnd = el; }}>
+                    <TabPanel>
+                        <div className="UserList">
+                            <div>
+                                {this.renderUsers()}
                             </div>
                         </div>
-                    </div>
-                    <SendChatMessage
-                        key="sendMsg"
-                        socket={this.state.socket}
-                        userID={this.state.userID}
-                        roomID={this.state.roomID}
-                    />
-                </TabPanel>
-            </Tabs>
+                    </TabPanel>
 
-        ]
+                    <TabPanel>
+                        <div key="chatWrap" className="chatBox">
+                            <div className="chatList">
+                                {this.renderMessages()}
+                                <div style={{ float:"left", clear: "both" }}
+                                     ref={(el) => { this.messagesEnd = el; }}>
+                                </div>
+                            </div>
+                        </div>
+                        <SendChatMessage
+                            key="sendMsg"
+                            socket={this.state.socket}
+                            userID={this.state.userID}
+                            roomID={this.state.roomID}
+                        />
+                    </TabPanel>
+                </Tabs>
+
+            ]
+        }
+        else{
+            return[
+                <Tabs style={{ width: '100%' }}>
+                    <TabList>
+                        <Tab>Users</Tab>
+                        <Tab>Chat</Tab>
+                    </TabList>
+
+                    <TabPanel>
+                        <div className="UserList">
+                            <div>
+                                {this.renderUsers()}
+                            </div>
+                        </div>
+                    </TabPanel>
+
+                    <TabPanel>
+                        <div key="chatWrap" className="chatBox">
+                            <div className="chatList">
+                                {this.renderMessages()}
+                                <div style={{ float:"left", clear: "both" }}
+                                     ref={(el) => { this.messagesEnd = el; }}>
+                                </div>
+                            </div>
+                        </div>
+                        <SendChatMessage
+                            key="sendMsg"
+                            socket={this.state.socket}
+                            userID={this.state.userID}
+                            roomID={this.state.roomID}
+                        />
+                    </TabPanel>
+                </Tabs>
+            ]
+        }
+
     }
 }

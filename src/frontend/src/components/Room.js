@@ -166,6 +166,7 @@ export default class Room extends React.Component {
                         socket={this.state.socket}
                         partyLeaderID={this.state.partyLeaderID}
                         founderID={this.state.founderID}
+                        theatreMode={this.state.theatreMode}
                     />
                     <VideoQueue
                         className="VideoQueue"
@@ -233,6 +234,7 @@ export default class Room extends React.Component {
                         socket={this.state.socket}
                         partyLeaderID={this.state.partyLeaderID}
                         founderID={this.state.founderID}
+                        theatreMode={this.state.theatreMode}
                     />
                 </div>
 
