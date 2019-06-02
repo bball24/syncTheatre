@@ -43,7 +43,7 @@ export default class Profile extends Component {
                 <div className="innerWrap">
                     <h2>Profile</h2>
                     <span className="profile">
-                        <img src={this.state.photo}/>
+                        <img className="profilePic" src={this.state.photo}/>
                         <div className='username'>Current UserName: {this.state.userName}</div>
                         <div className='button'>
                             <Button variant="primary" block size="lg"onClick={this.handleSubmit}>Change UserName</Button>
