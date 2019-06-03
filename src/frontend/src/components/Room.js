@@ -71,7 +71,7 @@ export default class Room extends React.Component {
         socket.on('pauseVideo', () => {lib.pauseVideo()});
         socket.on('seekVideo', (time) => {lib.seekVideo(time)});
         socket.on('updateQueue', () => {lib.updateQueue(this._videoQueueComponent)})
-        socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox, this)});
+        socket.on('resLeader', (leadID) => {lib.resLeader(leadID, this._chatBox, this, this._videoQueueComponent)});
         socket.on('chatMessage', (name, id, msg) => {lib.chatMessage(name, id, msg, this._chatBox)});
         socket.on('updateUsers', () => {lib.updateUsers(this._chatBox)});
         socket.on('latencyPong', () => {lib.latencyPong()});
@@ -217,6 +217,7 @@ export default class Room extends React.Component {
                         roomID={this.state.roomID}
                         apiHost={this.state.apiHost}
                         socket={this.state.socket}
+                        partyLeaderID={this.state.partyLeaderID}
                     />
                     <AddVideo
                         key="form"

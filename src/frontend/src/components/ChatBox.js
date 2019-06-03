@@ -210,9 +210,6 @@ export default class ChatBox extends React.Component {
                         <div key="chatWrap" className="chatBox">
                             <div className="chatList">
                                 {this.renderMessages()}
-                                <div style={{ float:"left", clear: "both" }}
-                                     ref={(el) => { this.messagesEnd = el; }}>
-                                </div>
                             </div>
                         </div>
                         <SendChatMessage

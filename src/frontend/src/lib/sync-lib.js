@@ -136,13 +136,19 @@ export default class SyncLib {
 
     }
 
-    resLeader(partyLeaderID, chatBox, room){
+    resLeader(partyLeaderID, chatBox, room, queue){
         room.setState({
             curTime : this.player.getCurrentTime(),
             partyLeaderID : partyLeaderID
         });
         this.socketLog("[resLeader] received. Party leader is: " + partyLeaderID);
-        chatBox.current.updateCurrentLeader(partyLeaderID);
+        if(chatBox){
+            chatBox.current.updateCurrentLeader(partyLeaderID);
+        }
+        if(queue){
+            queue.current.updateCurrentLeader(partyLeaderID);
+        }
+
     }
 
     playVideo(){

@@ -20,6 +20,7 @@ export default class VideoQueue extends React.Component {
             roomID : props.roomID,
             apiHost : props.apiHost,
             socket : props.socket,
+            partyLeaderID : props.partyLeaderID
         };
 
         //bindings
@@ -29,6 +30,8 @@ export default class VideoQueue extends React.Component {
         this.playVideo = this.playVideo.bind(this);
         this.shiftRight = this.shiftRight.bind(this);
         this.deleteVid = this.deleteVid.bind(this);
+        this.updateCurrentLeader = this.updateCurrentLeader.bind(this);
+        this.userIsLeader = this.userIsLeader.bind(this);
         this.updateQueue();
     }
 
@@ -120,33 +123,59 @@ export default class VideoQueue extends React.Component {
         })
     }
 
+    userIsLeader(){
+        return this.state.partyLeaderID == this.state.userID;
+    }
+
+    updateCurrentLeader(newLeaderID){
+        console.log("chatbox updating leader with ID" + newLeaderID);
+        this.setState({ partyLeaderID : newLeaderID });
+    }
+
     renderVids(){
         if(this.state.videoQueue){
-            return this.state.videoQueue.map((vid, i) => {
-                return(
-                <div className='vid' key={i}>
-                    <div className='vidControl'>
-                        <div className='vidControlIcons'>
-                            <div className='deleteWrapper'>
-                                <span title='delete video'><FaTimesCircle className='trashIcon' size={15} onClick={()=>{this.deleteVid(i)}}/></span>
+            if(this.userIsLeader()){
+                return this.state.videoQueue.map((vid, i) => {
+                    return(
+                        <div className='vid' key={i}>
+                            <div className='vidControl'>
+                                <div className='vidControlIcons'>
+                                    <div className='deleteWrapper'>
+                                        <span title='delete video'><FaTimesCircle className='trashIcon' size={15} onClick={()=>{this.deleteVid(i)}}/></span>
+                                    </div>
+                                    <div className='ctrlWrapper'>
+                                        <span title='shift left'><FaCaretSquareLeft className='ctrlIcons' onClick={()=>{this.shiftLeft(i)}} size={30}/></span>
+                                        <span title='play now'><FaPlayCircle className='ctrlIcons' size={30} onClick={()=>{this.playVideo(i)}}/></span>
+                                        <span title='shift right'><FaCaretSquareRight className='ctrlIcons' size={30} onClick={()=>{this.shiftRight(i)}}/></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className='ctrlWrapper'>
-                                <span title='shift left'><FaCaretSquareLeft className='ctrlIcons' onClick={()=>{this.shiftLeft(i)}} size={30}/></span>
-                                <span title='play now'><FaPlayCircle className='ctrlIcons' size={30} onClick={()=>{this.playVideo(i)}}/></span>
-                                <span title='shift right'><FaCaretSquareRight className='ctrlIcons' size={30} onClick={()=>{this.shiftRight(i)}}/></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='vidQueueInfo'>
-                        <div className="vidThumb">
-                            <img src={vid.thumb.url} />
-                        </div>
-                        <span className="vidTitle">
+                            <div className='vidQueueInfo'>
+                                <div className="vidThumb">
+                                    <img src={vid.thumb.url} />
+                                </div>
+                                <span className="vidTitle">
                             {vid.title}
                         </span>
-                    </div>
-                </div>);
-            });
+                            </div>
+                        </div>);
+                });
+            }
+            else{
+                return this.state.videoQueue.map((vid, i) => {
+                    return(
+                        <div className='vid' key={i}>
+                            <div className='vidQueueInfo'>
+                                <div className="vidThumb">
+                                    <img src={vid.thumb.url} />
+                                </div>
+                                <span className="vidTitle">
+                            {vid.title}
+                        </span>
+                            </div>
+                        </div>);
+                });
+            }
         }
         else{
             return <div>Loading..</div>
