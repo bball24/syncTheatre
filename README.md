@@ -1,6 +1,9 @@
 # syncTheatre
 CS 180 Project
 
+A web application for watching youtube videos with friends in sync. It includes the ability to create rooms, which you can invite your friends to, where you can enqueue videos and watch them together.
+
+
 ## Backend API Docs
 
 The following is documentation for the back-end
